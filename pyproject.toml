@@ -11,7 +11,7 @@
 #------------------------------------------------------------------------------
 [project]
 name = 'geminpy' # Package name on PyPI
-description = '' # Short description
+description = 'Automated OAuth wrapper for Google Gemini CLI on macOS' # Short description
 readme = 'README.md' # Path to README file
 requires-python = '>=3.10' # Minimum Python version
 keywords = [
@@ -33,6 +33,12 @@ classifiers = [
 ]
 
 dependencies = [
+    "fire>=0.5.0",
+    "playwright>=1.43.0",
+    "requests>=2.31.0",
+    "platformdirs>=4.0.0",
+    "loguru>=0.7.0",
+    "rich>=13.0.0",
 ]
 
 # Author information
@@ -92,7 +98,7 @@ all = [
 # Entry points for command-line executables installed with the package.
 #------------------------------------------------------------------------------
 [project.scripts]
-# CLINAME = "geminpy.__main__:main"
+geminpy = "geminpy.cli:main"
 
 #------------------------------------------------------------------------------
 # BUILD SYSTEM CONFIGURATION
@@ -413,8 +419,8 @@ unfixable = [
     'F401', # Don't automatically remove unused imports - may be needed later
 
 ]
-# Configure extend-exclude to ignore specific directories
-extend-exclude = [".git", ".venv", "venv", "dist", "build"]
+# Configure exclude to ignore specific directories
+exclude = [".git", ".venv", "venv", "dist", "build"]
 
 # isort configuration within Ruff
 [tool.ruff.lint.isort]

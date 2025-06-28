@@ -1,0 +1,70 @@
+# this_file: src/geminpy/cli.py
+"""CLI interface for Geminpy using Fire and Rich."""
+
+import asyncio
+from pathlib import Path
+
+import fire
+from rich.console import Console
+
+from geminpy.api import call_gemini_cli
+
+console = Console()
+
+
+def cli(
+    quit_chrome: bool = False,
+    verbose: bool = False,
+    user: str | None = None,
+    gemini_executable: str | Path = "gemini",
+    **gemini_args,
+) -> None:
+    """CLI interface for gemini with automated OAuth via Playwright.
+
+    Args:
+        quit_chrome: Quit Chrome after execution
+        verbose: Enable verbose debug logging
+        user: Specific user email to use for authentication
+        gemini_executable: Path to the gemini executable
+        **gemini_args: Arguments to pass to the gemini CLI
+    """
+    # Convert gemini_args dict to CLI argument list
+    cli_args = []
+    for key, value in gemini_args.items():
+        # Use single dash for single char, double dash for multi-char
+        flag = f"-{key}" if len(key) == 1 else f"--{key}"
+        cli_args.append(flag)
+
+        # Only add value if it's not a boolean True (flags don't need values)
+        if value is not True:
+            if value is False:
+                # Skip false flags entirely
+                cli_args.pop()  # Remove the flag we just added
+            else:
+                cli_args.append(str(value))
+
+    # Run the command
+    response = asyncio.run(
+        call_gemini_cli(
+            gemini_args=cli_args,
+            quit_chrome=quit_chrome,
+            user=user,
+            gemini_executable=gemini_executable,
+            verbose=verbose,
+        )
+    )
+
+    # Print response if we got one (for CLI usage)
+    if response:
+        console.print(response)
+    else:
+        console.print("[red]Failed to get response from Gemini[/red]")
+
+
+def main():
+    """Main entry point for the CLI."""
+    fire.Fire(cli)
+
+
+if __name__ == "__main__":
+    main()
