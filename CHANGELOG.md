@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Multi-language OAuth Support**: Enhanced OAuth button detection to support 9+ languages
+  - Added support for Polish, French, German, Spanish, Italian, Russian, Japanese, and Chinese
+  - Implemented multiple fallback strategies for button detection (by text, attributes, and styling)
+  - Addresses issue #101 where authentication failed on non-English Google OAuth pages
+- **CLI Model Shortcuts**: Added convenient shortcuts for common Gemini models
+  - `-P` / `--Pro` as shortcut for `-m 'gemini-2.5-pro'`
+  - `-F` / `--Flash` as shortcut for `-m 'gemini-2.5-flash'`
+  - Includes warnings when shortcuts override existing model arguments
 - **Enhanced Browser Management**: Improved `BrowserManager` with hanging prevention
   - Added check to prevent hanging when setting browser that's already default
   - Enhanced error handling and logging throughout browser management
@@ -19,6 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - All tests use proper mocking and async/await patterns
 
 ### Changed
+- Improved OAuth automation robustness with multi-strategy button detection
+- Enhanced CLI argument handling with Fire framework
 - Improved code quality with automatic linting and formatting fixes
 - Enhanced error handling and type safety throughout the codebase
 - **Browser Management**: Investigated using `macdefaultbrowsy` Python package but reverted to CLI approach due to incomplete package

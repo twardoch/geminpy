@@ -4,10 +4,10 @@
 
 Port the monolithic `work/gemini_wrapper.py` script into a well-structured Python package `geminpy` with proper separation of concerns, comprehensive testing, and modern Python best practices.
 
-## Phase 1: 
+## Phase 1: ✅ COMPLETED
 
-- [ ] Address `issues/101.txt`
-- [ ] In our CLI add `-P` / `--Pro` as a shortcut for `-m 'gemini-2.5-pro'` and `-F` / `--Flash` as a shortcut for `-m 'gemini-2.5-flash'` (that is, our CLI takes these args and puts the -m nnnn into the gemini args)
+- [x] Address `issues/101.txt` - Fixed OAuth button detection to handle multiple languages
+- [x] In our CLI add `-P` / `--Pro` as a shortcut for `-m 'gemini-2.5-pro'` and `-F` / `--Flash` as a shortcut for `-m 'gemini-2.5-flash'` (that is, our CLI takes these args and puts the -m nnnn into the gemini args)
 
 ## Phase 8: Documentation
 
