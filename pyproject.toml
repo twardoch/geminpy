@@ -132,6 +132,13 @@ exclude = ["**/__pycache__", "**/.pytest_cache", "**/.mypy_cache"]
 packages = ["src/geminpy"]
 reproducible = true
 
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/geminpy/**/*.py",
+    "README.md",
+    "LICENSE",
+    "pyproject.toml",
+]
 
 # Version control system hook configuration
 # Automatically updates the version file from git tags
