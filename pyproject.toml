@@ -260,7 +260,7 @@ exclude_lines = [
 ]
 
 [tool.coverage.run]
-source_pkgs = ["geminpy", "tests"]
+source_pkgs = ["src/geminpy", "tests"]
 branch = true # Measure branch coverage (if/else statements)
 parallel = true # Support parallel test execution
 omit = [
