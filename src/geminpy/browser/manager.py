@@ -15,7 +15,7 @@ class BrowserManager:
     def _require_defaultbrowser() -> None:
         """Ensure macdefaultbrowser utility is available."""
         require_command(
-            "macdefaultbrowser", 
+            "macdefaultbrowser",
             "Install with: brew install macdefaultbrowser"
         )
 
@@ -25,9 +25,9 @@ class BrowserManager:
         try:
             cls._require_defaultbrowser()
             result = subprocess.run(
-                ["macdefaultbrowser"], 
-                capture_output=True, 
-                text=True, 
+                ["macdefaultbrowser"],
+                capture_output=True,
+                text=True,
                 check=True
             )
             for line in result.stdout.splitlines():
@@ -35,7 +35,7 @@ class BrowserManager:
                 if line and line.startswith("* "):
                     return line[2:]
             return (
-                result.stdout.splitlines()[0].strip() 
+                result.stdout.splitlines()[0].strip()
                 if result.stdout.splitlines() else None
             )
         except Exception as e:
@@ -48,9 +48,9 @@ class BrowserManager:
         try:
             cls._require_defaultbrowser()
             result = subprocess.run(
-                ["macdefaultbrowser"], 
-                capture_output=True, 
-                text=True, 
+                ["macdefaultbrowser"],
+                capture_output=True,
+                text=True,
                 check=True
             )
             browsers = []
@@ -68,19 +68,19 @@ class BrowserManager:
     @classmethod
     def set_default(cls, browser_id: str) -> bool:
         """Set the default browser with hanging prevention.
-        
+
         Returns:
             bool: True if successful, False otherwise.
         """
         try:
             cls._require_defaultbrowser()
-            
+
             # Check if browser is already default to prevent hanging
             current_default = cls.get_current_default()
             if current_default == browser_id:
                 logger.info(f"{browser_id} is already the default browser.")
                 return True
-            
+
             logger.debug(f"Setting default browser to: {browser_id}")
             subprocess.run(["macdefaultbrowser", browser_id], check=True)
             return True
@@ -94,9 +94,9 @@ class BrowserManager:
         try:
             cls._require_defaultbrowser()
             result = subprocess.run(
-                ["macdefaultbrowser"], 
-                capture_output=True, 
-                text=True, 
+                ["macdefaultbrowser"],
+                capture_output=True,
+                text=True,
                 check=True
             )
             for line in result.stdout.splitlines():

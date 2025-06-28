@@ -66,11 +66,11 @@ Final content line.
     def test_extract_clean_response_with_whitespace(self):
         """Verify that leading/trailing whitespace is handled correctly."""
         parser = ResponseParser()
-        stdout = """   
+        stdout = """
 Code Assist login required
-   This is the response.   
-   Another line.   
-   
+   This is the response.
+   Another line.
+
 """
         result = parser.extract_clean_response(stdout)
         expected = "This is the response.\nAnother line."

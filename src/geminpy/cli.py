@@ -17,6 +17,10 @@ def cli(
     verbose: bool = False,
     user: str | None = None,
     gemini_executable: str | Path = "gemini",
+    P: bool = False,
+    Pro: bool = False,
+    F: bool = False,
+    Flash: bool = False,
     **gemini_args,
 ) -> None:
     """CLI interface for gemini with automated OAuth via Playwright.
@@ -26,8 +30,20 @@ def cli(
         verbose: Enable verbose debug logging
         user: Specific user email to use for authentication
         gemini_executable: Path to the gemini executable
+        P, Pro: Shortcut for -m 'gemini-2.5-pro'
+        F, Flash: Shortcut for -m 'gemini-2.5-flash'
         **gemini_args: Arguments to pass to the gemini CLI
     """
+    # Handle model shortcuts
+    if P or Pro:
+        if 'm' in gemini_args or 'model' in gemini_args:
+            console.print("[yellow]Warning: -P/--Pro overrides any existing -m/--model argument[/yellow]")
+        gemini_args['m'] = 'gemini-2.5-pro'
+    elif F or Flash:
+        if 'm' in gemini_args or 'model' in gemini_args:
+            console.print("[yellow]Warning: -F/--Flash overrides any existing -m/--model argument[/yellow]")
+        gemini_args['m'] = 'gemini-2.5-flash'
+
     # Convert gemini_args dict to CLI argument list
     cli_args = []
     for key, value in gemini_args.items():

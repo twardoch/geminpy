@@ -9,7 +9,7 @@ import requests
 from loguru import logger
 from playwright.async_api import Page, Playwright, async_playwright
 
-from geminpy.core.constants import CDP_VERSION_URL, OAUTH_SIGNIN_PATTERN, SUCCESS_PATTERN
+from geminpy.core.constants import CDP_VERSION_URL, SUCCESS_PATTERN
 from geminpy.core.exceptions import AuthenticationError
 
 
@@ -117,19 +117,73 @@ class OAuthAutomator:
             await asyncio.sleep(1)  # Reduced from 2 seconds
 
             logger.debug("Looking for sign-in button...")
-            sign_in_locator = page.get_by_role(
-                "button", name=re.compile("Sign in|Continue", re.IGNORECASE)
-            )
 
-            if await sign_in_locator.count() == 0:
+            # Try multiple strategies to find the sign-in button
+            sign_in_button = None
+
+            # Strategy 1: Look for button by text in multiple languages
+            button_texts = [
+                "Sign in", "Continue",  # English
+                "Zaloguj się", "Dalej", "Kontynuuj",  # Polish
+                "Se connecter", "Continuer",  # French
+                "Anmelden", "Weiter",  # German
+                "Acceder", "Continuar",  # Spanish
+                "Accedi", "Continua",  # Italian
+                "Войти", "Продолжить",  # Russian
+                "ログイン", "続行",  # Japanese
+                "登录", "继续",  # Chinese
+            ]
+
+            for text in button_texts:
+                locator = page.get_by_role("button", name=re.compile(re.escape(text), re.IGNORECASE))
+                if await locator.count() > 0:
+                    sign_in_button = locator.first
+                    logger.debug(f"Found sign-in button with text: {text}")
+                    break
+
+            # Strategy 2: If not found by text, look for buttons with specific attributes
+            if not sign_in_button:
+                # Look for buttons with common sign-in related attributes
+                selectors = [
+                    'button[type="submit"]',
+                    'button[data-action="sign-in"]',
+                    'button[jsname]',  # Google often uses jsname attributes
+                    'div[role="button"][tabindex="0"]',  # Sometimes buttons are divs
+                ]
+
+                for selector in selectors:
+                    elements = await page.query_selector_all(selector)
+                    # Filter to visible elements that look like primary buttons
+                    for element in elements:
+                        if await element.is_visible():
+                            # Check if it's likely a primary button (often blue/colored)
+                            box = await element.bounding_box()
+                            if box and box.get('width', 0) > 50:  # Reasonable button width
+                                sign_in_button = element
+                                logger.debug(f"Found sign-in button using selector: {selector}")
+                                break
+                    if sign_in_button:
+                        break
+
+            # Strategy 3: As last resort, look for the most prominent button
+            if not sign_in_button:
+                all_buttons = await page.query_selector_all('button, div[role="button"]')
+                for button in all_buttons:
+                    if await button.is_visible():
+                        # Check for primary button styling (often has background color)
+                        bg_color = await button.evaluate('(el) => window.getComputedStyle(el).backgroundColor')
+                        if bg_color and bg_color != 'rgba(0, 0, 0, 0)' and 'rgb' in bg_color:
+                            sign_in_button = button
+                            logger.debug("Found sign-in button by styling")
+                            break
+
+            if not sign_in_button:
                 await page.screenshot(path="oauth_error_no_signin.png")
-                msg = "Could not find 'Sign in' or 'Continue' button using get_by_role."
-                raise AuthenticationError(
-                    msg
-                )
+                msg = "Could not find sign-in button using any strategy"
+                raise AuthenticationError(msg)
 
             logger.debug("Sign-in button found, clicking it...")
-            await sign_in_locator.first.click()
+            await sign_in_button.click()
 
             # Step 3: Wait for success and close tab
             logger.debug("Waiting for success redirect...")

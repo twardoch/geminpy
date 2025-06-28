@@ -1,0 +1,148 @@
+This was when no Gemini CLI user was given, so it tried first account and failed: 
+
+```
+No specific user configured - will use first available account
+Original default browser: testing
+Using existing Chrome for Testing: /Applications/chrome/mac-138.0.7204.49/chrome-mac-x64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing
+Chrome for Testing path: /Applications/chrome/mac-138.0.7204.49/chrome-mac-x64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing
+Chrome CDP already listening — using existing browser.
+Waiting for Chrome CDP port to open...
+Chrome CDP is ready after 1 attempts.
+Running gemini: gemini -y -p Capital of Poland?
+Starting OAuth automation flow...
+Connecting to Chrome over CDP...
+Searching for Google OAuth page among open tabs...
+Found potential OAuth page: https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=http%3A%2F%2Flocalhost%3A52054%2Foauth2callback&access_type=offline&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcloud-platform%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile&state=985b31efb62f7501d7049159006936e191b0c6050eec20f54e9b7370359f47f1&response_type=code&client_id=681255809395-oo8ft2oprdrnp9e3aqf6av3hmdib135j.apps.googleusercontent.com
+Automating page: https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=http%3A%2F%2Flocalhost%3A52054%2Foauth2callback&access_type=offline&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcloud-platform%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile&state=985b31efb62f7501d7049159006936e191b0c6050eec20f54e9b7370359f47f1&response_type=code&client_id=681255809395-oo8ft2oprdrnp9e3aqf6av3hmdib135j.apps.googleusercontent.com
+Looking for first available account
+Account found (1 matches), clicking it...
+Waiting for the approval page to load...
+Looking for sign-in button...
+An error occurred during OAuth automation: Locator.count: Execution context was destroyed, most likely because of a navigation
+Saved a screenshot to oauth_error.png for debugging.
+Stopping Playwright.
+OAuth automation failed: Locator.count: Execution context was destroyed, most likely because of a navigation
+Rate limit detected, retrying with gemini-2.5-flash model...
+Running gemini: gemini -y -m gemini-2.5-flash -p Capital of Poland?
+Starting OAuth automation flow...
+Connecting to Chrome over CDP...
+Searching for Google OAuth page among open tabs...
+Found potential OAuth page: https://accounts.google.com/signin/oauth/firstparty/nativeapp?authuser=0&part=AJi8hAMX5fBQO4t-pmU_sZIfCag0aFPrtT5URUJmF2b8YA6yz_D2ilRBAxXXRyKjk3UMYdrd3NQ69ujvh1NmeGFZua1RPojBa5fKtOM-8AJM60fFEIzCIg7dw_-Ca75qWr0oTDFTtkWixYsZlWbehZlYhKtFCZmFLZq8xLPcYab08hi036veral4nMR_pLWZj6BS0aFS6w3hMJ0BZbOH1n4YASLEb7fuX2ygz2qZ-ke-7WkgIrWWP4RIBofX9iPMTWE8AGUrpprw9N51aputpIQZGFxH9ibjV84yuLTpVew63rWuutg2jqA6DVzC7iNHi9lyV6xOc929WHQAP9FhZzs8wi01ki5mSp4PIlnf_KSps7hmw5043UwJZ7et6-zF4OmvW6a7LFYrEWTOVLgXyr8UZOLdiMrbsN6l7sTMHH_Y-hU0B7c9-NG6G6EfqtkP1oqA6QEQXeRLmbw-G34i9rmQYAmJlLqpXfj2FC9Zf29cB16nR5aZKgQ&flowName=GeneralOAuthFlow&as=S1227407255%3A1751072208627448&client_id=681255809395-oo8ft2oprdrnp9e3aqf6av3hmdib135j.apps.googleusercontent.com&pli=1&rapt=AEjHL4MlcpYiwucdNhw9kKG4Xvl_zvS9AkLkgTXrlJnEUZoUJ8tJtZa9ysZSIYfrLzs38FnedGeYKgSGK-eR1WEP0MXfxoTBVw
+Automating page: https://accounts.google.com/signin/oauth/firstparty/nativeapp?authuser=0&part=AJi8hAMX5fBQO4t-pmU_sZIfCag0aFPrtT5URUJmF2b8YA6yz_D2ilRBAxXXRyKjk3UMYdrd3NQ69ujvh1NmeGFZua1RPojBa5fKtOM-8AJM60fFEIzCIg7dw_-Ca75qWr0oTDFTtkWixYsZlWbehZlYhKtFCZmFLZq8xLPcYab08hi036veral4nMR_pLWZj6BS0aFS6w3hMJ0BZbOH1n4YASLEb7fuX2ygz2qZ-ke-7WkgIrWWP4RIBofX9iPMTWE8AGUrpprw9N51aputpIQZGFxH9ibjV84yuLTpVew63rWuutg2jqA6DVzC7iNHi9lyV6xOc929WHQAP9FhZzs8wi01ki5mSp4PIlnf_KSps7hmw5043UwJZ7et6-zF4OmvW6a7LFYrEWTOVLgXyr8UZOLdiMrbsN6l7sTMHH_Y-hU0B7c9-NG6G6EfqtkP1oqA6QEQXeRLmbw-G34i9rmQYAmJlLqpXfj2FC9Zf29cB16nR5aZKgQ&flowName=GeneralOAuthFlow&as=S1227407255%3A1751072208627448&client_id=681255809395-oo8ft2oprdrnp9e3aqf6av3hmdib135j.apps.googleusercontent.com&pli=1&rapt=AEjHL4MlcpYiwucdNhw9kKG4Xvl_zvS9AkLkgTXrlJnEUZoUJ8tJtZa9ysZSIYfrLzs38FnedGeYKgSGK-eR1WEP0MXfxoTBVw
+Looking for first available account
+An error occurred during OAuth automation: Could not find any account using direct selection.
+Saved a screenshot to oauth_error.png for debugging.
+Stopping Playwright.
+OAuth automation failed: Could not find any account using direct selection.
+Failed to get response from Gemini
+```
+
+This is when I added "gemini_cli_user" to settings.json: 
+
+```
+Using user from settings.json: fontlab.ltd.spzoo@gmail.com
+Original default browser: testing
+Using existing Chrome for Testing: /Applications/chrome/mac-138.0.7204.49/chrome-mac-x64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing
+Chrome for Testing path: /Applications/chrome/mac-138.0.7204.49/chrome-mac-x64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing
+Chrome CDP already listening — using existing browser.
+Waiting for Chrome CDP port to open...
+Chrome CDP is ready after 1 attempts.
+Running gemini: gemini -y -p Capital of Poland?
+Starting OAuth automation flow...
+Connecting to Chrome over CDP...
+Searching for Google OAuth page among open tabs...
+Found potential OAuth page: https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=http%3A%2F%2Flocalhost%3A52170%2Foauth2callback&access_type=offline&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcloud-platform%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile&state=91bb33d569f4af0d222eb6b2b5637bfea820bd858a8dae1e9ca6e5e1300971d1&response_type=code&client_id=681255809395-oo8ft2oprdrnp9e3aqf6av3hmdib135j.apps.googleusercontent.com
+Automating page: https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=http%3A%2F%2Flocalhost%3A52170%2Foauth2callback&access_type=offline&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcloud-platform%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile&state=91bb33d569f4af0d222eb6b2b5637bfea820bd858a8dae1e9ca6e5e1300971d1&response_type=code&client_id=681255809395-oo8ft2oprdrnp9e3aqf6av3hmdib135j.apps.googleusercontent.com
+Looking for specific account: fontlab.ltd.spzoo@gmail.com
+Account found (1 matches), clicking it...
+Waiting for the approval page to load...
+Looking for sign-in button...
+Found sign-in button with text: Sign in
+Sign-in button found, clicking it...
+Waiting for success redirect...
+OAuth flow completed successfully ✔
+Success page reached: https://developers.google.com/gemini-code-assist/auth/auth_success_gemini
+Closing success tab...
+Success tab closed successfully
+Stopping Playwright.
+Automation flow finished.
+Waiting for gemini process to complete...
+Gemini stderr: Attempt 1 failed with status 429. Retrying with backoff... GaxiosError: [{
+Rate limit detected in real-time output!
+Terminating gemini process due to rate limit detection
+Rate limit detected, retrying with gemini-2.5-flash model...
+Running gemini: gemini -y -m gemini-2.5-flash -p Capital of Poland?
+Starting OAuth automation flow...
+Connecting to Chrome over CDP...
+Searching for Google OAuth page among open tabs...
+Found potential OAuth page: https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=http%3A%2F%2Flocalhost%3A52192%2Foauth2callback&access_type=offline&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcloud-platform%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile&state=1eb3c30226c61b364377d00e60bf724cc82d3551865f5be8736f02ae5ac2eef5&response_type=code&client_id=681255809395-oo8ft2oprdrnp9e3aqf6av3hmdib135j.apps.googleusercontent.com
+Automating page: https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=http%3A%2F%2Flocalhost%3A52192%2Foauth2callback&access_type=offline&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcloud-platform%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile&state=1eb3c30226c61b364377d00e60bf724cc82d3551865f5be8736f02ae5ac2eef5&response_type=code&client_id=681255809395-oo8ft2oprdrnp9e3aqf6av3hmdib135j.apps.googleusercontent.com
+Looking for specific account: fontlab.ltd.spzoo@gmail.com
+Account found (1 matches), clicking it...
+Waiting for the approval page to load...
+Looking for sign-in button...
+Found sign-in button with text: Sign in
+Sign-in button found, clicking it...
+Waiting for success redirect...
+OAuth flow completed successfully ✔
+Success page reached: https://developers.google.com/gemini-code-assist/auth/auth_success_gemini
+Closing success tab...
+Success tab closed successfully
+Stopping Playwright.
+Automation flow finished.
+Waiting for gemini process to complete...
+Gemini process completed with return code: 0
+Gemini process completed successfully.
+Clean model response: Warsaw.
+Warsaw.
+```
+
+This works great. So it’s only not working if there is no configured or passed gemini_cli_user 
+
+```
+python -m geminpy -p "Capital of Poland?" -F --verbose
+```
+
+```
+Using user from settings.json: fontlab.ltd.spzoo@gmail.com
+Original default browser: testing
+Using existing Chrome for Testing: /Applications/chrome/mac-138.0.7204.49/chrome-mac-x64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing
+Chrome for Testing path: /Applications/chrome/mac-138.0.7204.49/chrome-mac-x64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing
+Chrome CDP already listening — using existing browser.
+Waiting for Chrome CDP port to open...
+Chrome CDP is ready after 1 attempts.
+Running gemini: gemini -y -p Capital of Poland? -m gemini-2.5-flash
+Starting OAuth automation flow...
+Connecting to Chrome over CDP...
+Searching for Google OAuth page among open tabs...
+Found potential OAuth page: https://accounts.google.com/o/oauth2/v2/auth/oauthchooseaccount?redirect_uri=http%3A%2F%2Flocalhost%3A52274%2Foauth2callback&access_type=offline&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcloud-platform%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile&state=c49bba089271d37d18dd660eaa7e9ea18b620214135f9a9d5a7527fd8d7b5138&response_type=code&client_id=681255809395-oo8ft2oprdrnp9e3aqf6av3hmdib135j.apps.googleusercontent.com&service=lso&o2v=2&flowName=GeneralOAuthFlow
+Automating page: https://accounts.google.com/o/oauth2/v2/auth/oauthchooseaccount?redirect_uri=http%3A%2F%2Flocalhost%3A52274%2Foauth2callback&access_type=offline&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcloud-platform%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile&state=c49bba089271d37d18dd660eaa7e9ea18b620214135f9a9d5a7527fd8d7b5138&response_type=code&client_id=681255809395-oo8ft2oprdrnp9e3aqf6av3hmdib135j.apps.googleusercontent.com&service=lso&o2v=2&flowName=GeneralOAuthFlow
+Looking for specific account: fontlab.ltd.spzoo@gmail.com
+Account found (1 matches), clicking it...
+Waiting for the approval page to load...
+Looking for sign-in button...
+Found sign-in button with text: Sign in
+Sign-in button found, clicking it...
+Waiting for success redirect...
+OAuth flow completed successfully ✔
+Success page reached: https://developers.google.com/gemini-code-assist/auth/auth_success_gemini
+Closing success tab...
+Success tab closed successfully
+Stopping Playwright.
+Automation flow finished.
+Waiting for gemini process to complete...
+Gemini process completed with return code: 0
+Gemini process completed successfully.
+Clean model response: Warsaw.
+Warsaw.
+```
+
+```
+python -m geminpy -p "Capital of Poland?" -F
+```
+
+```
+Warsaw.
+```
+
+Note: SOMETIMES the 2nd action (clicking the Sign in button) is not working. We need to make it more robust. 
