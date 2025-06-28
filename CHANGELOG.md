@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Enhanced Browser Management**: Improved `BrowserManager` with hanging prevention
   - Added check to prevent hanging when setting browser that's already default
   - Enhanced error handling and logging throughout browser management
-  - Maintains compatibility with `macdefaultbrowser` CLI tool
+  - Maintains compatibility with `macdefaultbrowsy` CLI tool
 - **Comprehensive Test Suite**: 45 tests with 72% overall coverage
   - Browser module tests: OAuth automation, Chrome management, browser switching
   - Gemini module tests: CLI execution, response parsing, rate limit detection
@@ -35,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Technical Notes
 - Attempted integration with `macdefaultbrowsy` Python package for more reliable browser management
-- Package was found to be incomplete (missing core modules) so reverted to `macdefaultbrowser` CLI
+- Package was found to be incomplete (missing core modules) so reverted to `macdefaultbrowsy` CLI
 - Added hanging prevention logic directly in `BrowserManager.set_default()` method
 - All tests updated and passing with the CLI-based approach
 

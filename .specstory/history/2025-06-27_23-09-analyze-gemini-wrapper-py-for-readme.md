@@ -49,7 +49,7 @@ Read file: work/gemini_wrapper.py
 - 
 - we need to parse out the final path. 
 - 
-- And we’ll be using that browser. We need to be setting the `macdefaultbrowser testing`
+- And we’ll be using that browser. We need to be setting the `macdefaultbrowsy testing`
 + # Gemini CLI OAuth Automation Wrapper
 + 
 + An automated OAuth wrapper for Google's `gemini` CLI tool on macOS that eliminates the need for manual authentication steps.
@@ -59,7 +59,7 @@ Read file: work/gemini_wrapper.py
 + The `gemini_wrapper.py` script automates the complete Google OAuth flow for the `gemini` CLI by:
 + 
 + 1. **Installing Chrome for Testing** if not available (using `@puppeteer/browsers`)
-+ 2. **Temporarily switching default browser** to Chrome for Testing (using `macdefaultbrowser`)
++ 2. **Temporarily switching default browser** to Chrome for Testing (using `macdefaultbrowsy`)
 + 3. **Launching Chrome** in remote debugging mode (port 9222)
 + 4. **Running the `gemini` CLI** with your specified arguments
 + 5. **Automating OAuth screens** via Playwright-over-CDP - selecting your account and clicking "Sign in"
@@ -95,8 +95,8 @@ Read file: work/gemini_wrapper.py
 + 
 + #### Install required tools:
 + ```bash
-+ # Install macdefaultbrowser utility
-+ brew install macdefaultbrowser
++ # Install macdefaultbrowsy utility
++ brew install macdefaultbrowsy
 + 
 + # Install Playwright browsers (one-time setup)
 + playwright install chromium
@@ -231,9 +231,9 @@ Read file: work/gemini_wrapper.py
 + - Check if port 9222 is blocked: `curl http://localhost:9222/json/version`
 + - Look at debug logs: `/tmp/gemini_chrome_stderr.log`
 + 
-+ **"macdefaultbrowser utility missing"**
++ **"macdefaultbrowsy utility missing"**
 + ```bash
-+ brew install macdefaultbrowser
++ brew install macdefaultbrowsy
 + ```
 + 
 + **Authentication fails**
@@ -290,7 +290,7 @@ Eliminates manual OAuth authentication steps when using Google's Gemini CLI by a
 
 ### 🔧 **Key Components**
 - **ChromeTestingManager**: Installs and manages Chrome for Testing
-- **BrowserManager**: Handles default browser switching via `macdefaultbrowser` 
+- **BrowserManager**: Handles default browser switching via `macdefaultbrowsy` 
 - **ChromeManager**: Manages Chrome processes and CDP connections
 - **OAuthAutomator**: Automates the actual OAuth flow using Playwright
 - **UserResolver**: Resolves user email from multiple sources (CLI, env var, settings)

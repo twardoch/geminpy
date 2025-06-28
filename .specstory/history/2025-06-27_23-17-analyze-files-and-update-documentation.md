@@ -872,7 +872,7 @@ Empty file. I'll mock `subprocess.run` and test `BrowserManager`.
 + @patch("geminpy.browser.manager.require_command")
 + @patch("subprocess.run")
 + def test_get_current_default(mock_run, mock_require):
-+     """Verify that get_current_default correctly parses macdefaultbrowser output."""
++     """Verify that get_current_default correctly parses macdefaultbrowsy output."""
 +     mock_process = MagicMock()
 +     mock_process.stdout = "safari\n* chrome\nfirefox\n"
 +     mock_run.return_value = mock_process
@@ -885,7 +885,7 @@ Empty file. I'll mock `subprocess.run` and test `BrowserManager`.
 + @patch("geminpy.browser.manager.require_command")
 + @patch("subprocess.run")
 + def test_get_available_browsers(mock_run, mock_require):
-+     """Verify that get_available_browsers correctly parses macdefaultbrowser output."""
++     """Verify that get_available_browsers correctly parses macdefaultbrowsy output."""
 +     mock_process = MagicMock()
 +     mock_process.stdout = "safari\n* chrome\nfirefox\n"
 +     mock_run.return_value = mock_process
@@ -898,10 +898,10 @@ Empty file. I'll mock `subprocess.run` and test `BrowserManager`.
 + @patch("geminpy.browser.manager.require_command")
 + @patch("subprocess.run")
 + def test_set_default(mock_run, mock_require):
-+     """Verify that set_default calls macdefaultbrowser with the correct arguments."""
++     """Verify that set_default calls macdefaultbrowsy with the correct arguments."""
 +     BrowserManager.set_default("firefox")
 +     mock_require.assert_called_once()
-+     mock_run.assert_called_once_with(["macdefaultbrowser", "firefox"], check=True)
++     mock_run.assert_called_once_with(["macdefaultbrowsy", "firefox"], check=True)
   
 ```
 
@@ -3348,7 +3348,7 @@ all_hint}")
 src/geminpy/utils/platform.py:29:70: W292 [*] No newline at end of file
    |
 27 |     require_macos()
-28 |     require_command("macdefaultbrowser", "Install with: brew install macdef
+28 |     require_command("macdefaultbrowsy", "Install with: brew install macdef
 aultbrowser")
 29 |     require_command("npx", "Install Node.js from https://nodejs.org")
    |                                                                      ^ W292
@@ -3844,7 +3844,7 @@ cutable path
    |
 24 |         cls._require_defaultbrowser()
 25 |         result = subprocess.run(
-26 |             ["macdefaultbrowser"], capture_output=True, text=True, check=Tr
+26 |             ["macdefaultbrowsy"], capture_output=True, text=True, check=Tr
 ue
    |             ^^^^^^^^^^^^^^^^^^^^^ S607
 27 |         )
@@ -3867,7 +3867,7 @@ cutable path
    |
 39 |         cls._require_defaultbrowser()
 40 |         result = subprocess.run(
-41 |             ["macdefaultbrowser"], capture_output=True, text=True, check=Tr
+41 |             ["macdefaultbrowsy"], capture_output=True, text=True, check=Tr
 ue
    |             ^^^^^^^^^^^^^^^^^^^^^ S607
 42 |         )
@@ -3891,7 +3891,7 @@ src/geminpy/browser/manager.py:55:9: S603 `subprocess` call: check for execution
    |
 53 |         cls._require_defaultbrowser()
 54 |         logger.debug(f"Setting default browser to: {browser_id}")
-55 |         subprocess.run(["macdefaultbrowser", browser_id], check=True)
+55 |         subprocess.run(["macdefaultbrowsy", browser_id], check=True)
    |         ^^^^^^^^^^^^^^ S603
    |
 
@@ -3900,7 +3900,7 @@ cutable path
    |
 53 |         cls._require_defaultbrowser()
 54 |         logger.debug(f"Setting default browser to: {browser_id}")
-55 |         subprocess.run(["macdefaultbrowser", browser_id], check=True)
+55 |         subprocess.run(["macdefaultbrowsy", browser_id], check=True)
    |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ S607
    |
 
@@ -6188,7 +6188,7 @@ _**User**_
 
 we have a new @https://github.com/twardoch/macdefaultbrowsy  package what we can install via uv pip install macdefaultbrowsy 
 
-and use it as a Py package instead of the unreliable macdefaultbrowser CLI
+and use it as a Py package instead of the unreliable macdefaultbrowsy CLI
 
 
 
@@ -6199,7 +6199,7 @@ and use it as a Py package instead of the unreliable macdefaultbrowser CLI
 
 _**Assistant**_
 
-I can see that you've successfully created and published the `macdefaultbrowsy` package! This is a much better solution than relying on the unreliable `macdefaultbrowser` CLI. Let me update the `geminpy` project to use this new package instead.
+I can see that you've successfully created and published the `macdefaultbrowsy` package! This is a much better solution than relying on the unreliable `macdefaultbrowsy` CLI. Let me update the `geminpy` project to use this new package instead.
 
 ---
 
@@ -6235,9 +6235,9 @@ Perfect! Now I can see exactly how the current `BrowserManager` is using the CLI
   
       @staticmethod
 -     def _require_defaultbrowser() -> None:
--         """Ensure macdefaultbrowser utility is available."""
+-         """Ensure macdefaultbrowsy utility is available."""
 -         require_command(
--             "macdefaultbrowser", "Install with: brew install macdefaultbrowser"
+-             "macdefaultbrowsy", "Install with: brew install macdefaultbrowsy"
 -         )
 - 
 -     @classmethod
@@ -6246,7 +6246,7 @@ Perfect! Now I can see exactly how the current `BrowserManager` is using the CLI
           """Get current default browser identifier."""
 -         cls._require_defaultbrowser()
 -         result = subprocess.run(
--             ["macdefaultbrowser"], capture_output=True, text=True, check=True
+-             ["macdefaultbrowsy"], capture_output=True, text=True, check=True
 -         )
 -         for line in result.stdout.splitlines():
 -             line = line.strip()
@@ -6269,7 +6269,7 @@ Perfect! Now I can see exactly how the current `BrowserManager` is using the CLI
           """List all available browser identifiers."""
 -         cls._require_defaultbrowser()
 -         result = subprocess.run(
--             ["macdefaultbrowser"], capture_output=True, text=True, check=True
+-             ["macdefaultbrowsy"], capture_output=True, text=True, check=True
 -         )
 -         browsers = []
 -         for line in result.stdout.splitlines():
@@ -6283,7 +6283,7 @@ Perfect! Now I can see exactly how the current `BrowserManager` is using the CLI
 -         """Set the default browser."""
 -         cls._require_defaultbrowser()
 -         logger.debug(f"Setting default browser to: {browser_id}")
--         subprocess.run(["macdefaultbrowser", browser_id], check=True)
+-         subprocess.run(["macdefaultbrowsy", browser_id], check=True)
 +         try:
 +             # Get browsers as dict from macdefaultbrowsy
 +             browsers_dict = macdefaultbrowsy._get_available_browsers()

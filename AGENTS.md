@@ -118,7 +118,7 @@ An automated OAuth wrapper for Google's `gemini` CLI tool on macOS that eliminat
 The `gemini_wrapper.py` script automates the complete Google OAuth flow for the `gemini` CLI by:
 
 1. **Installing Chrome for Testing** if not available (using `@puppeteer/browsers`)
-2. **Temporarily switching default browser** to Chrome for Testing (using `macdefaultbrowser`)
+2. **Temporarily switching default browser** to Chrome for Testing (using `macdefaultbrowsy`)
 3. **Launching Chrome** in remote debugging mode (port 9222)
 4. **Running the `gemini` CLI** with your specified arguments
 5. **Automating OAuth screens** via Playwright-over-CDP - selecting your account and clicking "Sign in"
@@ -154,8 +154,8 @@ The `gemini_wrapper.py` script automates the complete Google OAuth flow for the 
 
 #### 9.1.1. Install required tools:
 ```bash
-# Install macdefaultbrowser utility
-brew install macdefaultbrowser
+# Install macdefaultbrowsy utility
+brew install macdefaultbrowsy
 
 # Install Playwright browsers (one-time setup)
 playwright install chromium
@@ -290,9 +290,9 @@ Settings are automatically stored in:
 - Check if port 9222 is blocked: `curl http://localhost:9222/json/version`
 - Look at debug logs: `/tmp/gemini_chrome_stderr.log`
 
-**"macdefaultbrowser utility missing"**
+**"macdefaultbrowsy utility missing"**
 ```bash
-brew install macdefaultbrowser
+brew install macdefaultbrowsy
 ```
 
 **Authentication fails**

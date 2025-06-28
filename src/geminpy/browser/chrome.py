@@ -72,16 +72,12 @@ class ChromeTestingManager:
 
         if not executable_path:
             msg = f"Could not parse Chrome for Testing path from output: {result.stdout}"
-            raise ChromeInstallationError(
-                msg
-            )
+            raise ChromeInstallationError(msg)
 
         path = Path(executable_path)
         if not path.exists():
             msg = f"Chrome for Testing executable not found at: {executable_path}"
-            raise ChromeInstallationError(
-                msg
-            )
+            raise ChromeInstallationError(msg)
 
         logger.debug(f"Chrome for Testing installed at: {executable_path}")
         self.set_stored_path(path)
@@ -97,12 +93,10 @@ class ChromeTestingManager:
             logger.debug(f"Using existing Chrome for Testing: {stored_path}")
             return stored_path
 
-        # Check if 'testing' browser is available in macdefaultbrowser
+        # Check if 'testing' browser is available in macdefaultbrowsy
         available_browsers = BrowserManager.get_available_browsers()
         if BrowserID.TESTING not in available_browsers:
-            logger.debug(
-                f"'{BrowserID.TESTING}' browser not found in available browsers: {available_browsers}"
-            )
+            logger.debug(f"'{BrowserID.TESTING}' browser not found in available browsers: {available_browsers}")
             logger.debug("Installing Chrome for Testing...")
             return self.install()
         logger.debug(f"'{BrowserID.TESTING}' browser found in available browsers")
@@ -144,16 +138,12 @@ class ChromeManager:
 
         logger.debug(f"Chrome stderr will be logged to: {stderr_file}")
 
-        return subprocess.Popen(
-            args, stdout=subprocess.DEVNULL, stderr=open(stderr_file, "a")
-        )
+        return subprocess.Popen(args, stdout=subprocess.DEVNULL, stderr=open(stderr_file, "a"))
 
     def is_cdp_ready(self) -> bool:
         """Check if Chrome CDP endpoint is ready."""
         try:
-            response = requests.get(
-                CDP_VERSION_URL.format(port=self.config.debug_port), timeout=1
-            )
+            response = requests.get(CDP_VERSION_URL.format(port=self.config.debug_port), timeout=1)
             return response.status_code == 200
         except requests.RequestException:
             return False
@@ -168,21 +158,15 @@ class ChromeManager:
         while time.time() - start_time < timeout:
             retry_count += 1
             try:
-                response = requests.get(
-                    CDP_VERSION_URL.format(port=self.config.debug_port), timeout=1
-                )
+                response = requests.get(CDP_VERSION_URL.format(port=self.config.debug_port), timeout=1)
                 if response.status_code == 200:
                     logger.debug(f"Chrome CDP is ready after {retry_count} attempts.")
                     return
-                logger.debug(
-                    f"retry {retry_count}/{max_retries} … HTTP {response.status_code}"
-                )
+                logger.debug(f"retry {retry_count}/{max_retries} … HTTP {response.status_code}")
             except requests.ConnectionError:
                 logger.debug(f"retry {retry_count}/{max_retries} … connection refused")
             except requests.RequestException as e:
-                logger.debug(
-                    f"retry {retry_count}/{max_retries} … {type(e).__name__}: {e}"
-                )
+                logger.debug(f"retry {retry_count}/{max_retries} … {type(e).__name__}: {e}")
 
             await asyncio.sleep(1)
 
@@ -201,6 +185,4 @@ You should get a JSON response with 'webSocketDebuggerUrl'.
 """
         logger.error(error_msg.strip())
         msg = f"Chrome CDP did not become available after {retry_count} attempts."
-        raise ChromeError(
-            msg
-        )
+        raise ChromeError(msg)

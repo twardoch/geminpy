@@ -13,31 +13,20 @@ class BrowserManager:
 
     @staticmethod
     def _require_defaultbrowser() -> None:
-        """Ensure macdefaultbrowser utility is available."""
-        require_command(
-            "macdefaultbrowser",
-            "Install with: brew install macdefaultbrowser"
-        )
+        """Ensure macdefaultbrowsy utility is available."""
+        require_command("macdefaultbrowsy", "Install with: brew install macdefaultbrowsy")
 
     @classmethod
     def get_current_default(cls) -> str | None:
         """Get current default browser identifier."""
         try:
             cls._require_defaultbrowser()
-            result = subprocess.run(
-                ["macdefaultbrowser"],
-                capture_output=True,
-                text=True,
-                check=True
-            )
+            result = subprocess.run(["macdefaultbrowsy"], capture_output=True, text=True, check=True)
             for line in result.stdout.splitlines():
                 line = line.strip()
                 if line and line.startswith("* "):
                     return line[2:]
-            return (
-                result.stdout.splitlines()[0].strip()
-                if result.stdout.splitlines() else None
-            )
+            return result.stdout.splitlines()[0].strip() if result.stdout.splitlines() else None
         except Exception as e:
             logger.error(f"Failed to get current default browser: {e}")
             return None
@@ -47,19 +36,12 @@ class BrowserManager:
         """List all available browser identifiers."""
         try:
             cls._require_defaultbrowser()
-            result = subprocess.run(
-                ["macdefaultbrowser"],
-                capture_output=True,
-                text=True,
-                check=True
-            )
+            result = subprocess.run(["macdefaultbrowsy"], capture_output=True, text=True, check=True)
             browsers = []
             for line in result.stdout.splitlines():
                 line = line.strip()
                 if line:
-                    browsers.append(
-                        line[2:] if line.startswith("* ") else line
-                    )
+                    browsers.append(line[2:] if line.startswith("* ") else line)
             return browsers
         except Exception as e:
             logger.error(f"Failed to get available browsers: {e}")
@@ -82,7 +64,7 @@ class BrowserManager:
                 return True
 
             logger.debug(f"Setting default browser to: {browser_id}")
-            subprocess.run(["macdefaultbrowser", browser_id], check=True)
+            subprocess.run(["macdefaultbrowsy", browser_id], check=True)
             return True
         except Exception as e:
             logger.error(f"Failed to set default browser to {browser_id}: {e}")
@@ -93,12 +75,7 @@ class BrowserManager:
         """List all available browsers, marking the default with a *."""
         try:
             cls._require_defaultbrowser()
-            result = subprocess.run(
-                ["macdefaultbrowser"],
-                capture_output=True,
-                text=True,
-                check=True
-            )
+            result = subprocess.run(["macdefaultbrowsy"], capture_output=True, text=True, check=True)
             for line in result.stdout.splitlines():
                 logger.info(line.strip())
         except Exception as e:

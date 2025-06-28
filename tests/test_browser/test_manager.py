@@ -9,7 +9,7 @@ from geminpy.browser.manager import BrowserManager
 @patch("geminpy.browser.manager.require_command")
 @patch("subprocess.run")
 def test_get_current_default(mock_run, mock_require):
-    """Verify that get_current_default correctly parses macdefaultbrowser output."""
+    """Verify that get_current_default correctly parses macdefaultbrowsy output."""
     mock_process = MagicMock()
     mock_process.stdout = "safari\n* chrome\nfirefox\n"
     mock_run.return_value = mock_process
@@ -35,7 +35,7 @@ def test_get_current_default_none(mock_run, mock_require):
 @patch("geminpy.browser.manager.require_command")
 @patch("subprocess.run")
 def test_get_available_browsers(mock_run, mock_require):
-    """Verify that get_available_browsers correctly parses macdefaultbrowser output."""
+    """Verify that get_available_browsers correctly parses macdefaultbrowsy output."""
     mock_process = MagicMock()
     mock_process.stdout = "safari\n* chrome\nfirefox\n"
     mock_run.return_value = mock_process
@@ -48,7 +48,7 @@ def test_get_available_browsers(mock_run, mock_require):
 @patch("geminpy.browser.manager.require_command")
 @patch("subprocess.run")
 def test_set_default_success(mock_run, mock_require):
-    """Verify that set_default calls macdefaultbrowser with the correct arguments."""
+    """Verify that set_default calls macdefaultbrowsy with the correct arguments."""
     # Mock get_current_default to return different browser
     mock_process = MagicMock()
     mock_process.stdout = "safari\n* chrome\nfirefox\n"
@@ -78,7 +78,7 @@ def test_set_default_already_default(mock_run, mock_require):
 @patch("geminpy.browser.manager.require_command")
 @patch("subprocess.run")
 def test_list_browsers(mock_run, mock_require):
-    """Verify that list_browsers calls macdefaultbrowser and logs output."""
+    """Verify that list_browsers calls macdefaultbrowsy and logs output."""
     mock_process = MagicMock()
     mock_process.stdout = "safari\n* chrome\nfirefox\n"
     mock_run.return_value = mock_process

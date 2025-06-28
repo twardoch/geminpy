@@ -35,7 +35,7 @@ User Request → GeminiClient → Browser Setup → OAuth Automation → Gemini 
                      ↓              ↓               ↓                ↓
               BrowserManager  ChromeManager  OAuthAutomator  GeminiExecutor
                      ↓              ↓               ↓                ↓
-              macdefaultbrowser  Chrome CDP    Playwright      subprocess
+              macdefaultbrowsy  Chrome CDP    Playwright      subprocess
 ```
 
 ### Automation Flow
@@ -69,7 +69,7 @@ User Request → GeminiClient → Browser Setup → OAuth Automation → Gemini 
 
 ### Key Components
 
-- **`browser.manager`**: Controls macOS default browser via `macdefaultbrowser`
+- **`browser.manager`**: Controls macOS default browser via `macdefaultbrowsy`
 - **`browser.chrome`**: Manages Chrome for Testing installation and lifecycle
 - **`browser.automation`**: Playwright-based OAuth flow automation
 - **`gemini.client`**: Main orchestrator coordinating all components
@@ -207,12 +207,6 @@ Original request → Rate limit detected → Retry with gemini-2.5-flash → Fin
 - Check screenshots: `oauth_error.png`, `oauth_error_no_signin.png`
 - Ensure your Google account has Gemini access
 
-**"macdefaultbrowser utility missing"**
-
-```bash
-brew install macdefaultbrowser
-```
-
 ### Debug Mode
 
 Enable comprehensive logging:
@@ -291,7 +285,6 @@ uv pip install --system -e .
 
 - **Platform**: macOS (Darwin) only
 - **Python**: 3.10, 3.11, or 3.12
-- **System**: `macdefaultbrowser` utility
 - **Browser**: Chrome for Testing (auto-installed)
 
 ## License
