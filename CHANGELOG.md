@@ -40,6 +40,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Falls back to hardcoded defaults if Gemini CLI is not installed
   - Ensures shortcuts stay synchronized with Google's official model definitions
   - Cross-platform npm global directory resolution
+- **Test Coverage Improvements**: 
+  - Added comprehensive CLI tests achieving 100% coverage for cli.py
+  - 11 new tests covering all CLI functionality including model shortcuts, interactive mode, and error handling
+  - Total test count increased from 45 to 56 tests
 
 ### Changed
 - Improved OAuth automation robustness with multi-strategy button detection
