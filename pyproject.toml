@@ -39,7 +39,7 @@ dependencies = [
     "platformdirs>=4.0.0",
     "loguru>=0.7.0",
     "rich>=13.0.0",
-    "macdefaultbrowsy>=1.0.0",
+    "macdefaultbrowsy>=2.1.1",
     "aiohttp>=3.8.0",
 ]
 
@@ -93,6 +93,30 @@ docs = [
 
 # All optional dependencies combined
 all = [
+    "aiohttp>=3.8.0",
+    "fire>=0.5.0",
+    "loguru>=0.7.0",
+    "macdefaultbrowsy>=2.1.1",
+    "myst-parser>=3.0.0", # Markdown support in Sphinx
+    "platformdirs>=4.0.0",
+    "playwright>=1.43.0",
+    "requests>=2.31.0",
+    "rich>=13.0.0",
+    "sphinx-autodoc-typehints>=2.0.0",
+    "sphinx-rtd-theme>=2.0.0",
+    "sphinx>=7.2.6",
+    'absolufy-imports>=0.3.1', # Convert relative imports to absolute - Keep absolufy-imports as is, update if newer absolufy-imports version is required
+    'coverage[toml]>=7.6.12',
+    'isort>=6.0.1', # Sort imports - Keep isort as is, update if newer isort version is required
+    'mypy>=1.15.0', # Type checking - Keep mypy as is, update if newer mypy version is required
+    'pre-commit>=4.1.0', # Pre-commit hook manager - Keep pre-commit as is, update if newer pre-commit version is required
+    'pytest-asyncio>=0.25.3', # Async test support - Keep pytest-asyncio as is, update if newer pytest-asyncio version is required
+    'pytest-benchmark[histogram]>=5.1.0', # Benchmarking plugin - Keep pytest-benchmark as is, update if newer pytest-benchmark version is required
+    'pytest-cov>=6.0.0', # Coverage plugin for pytest - Keep pytest-cov as is, update if newer pytest-cov version is required
+    'pytest-xdist>=3.6.1', # Parallel test execution - Keep pytest-xdist as is, update if newer pytest-xdist version is required
+    'pytest>=8.3.4', # Testing framework - Keep pytest as is, update if newer pytest version is required
+    'pyupgrade>=3.19.1', # Upgrade Python syntax - Keep pyupgrade as is, update if newer pyupgrade version is required
+    'ruff>=0.9.7', # Linting and formatting - Keep ruff as is, update if newer ruff version is required
 ]
 
 #------------------------------------------------------------------------------
