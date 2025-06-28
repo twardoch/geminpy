@@ -4,6 +4,7 @@
 import re
 import subprocess
 from pathlib import Path
+from typing import Any
 
 from loguru import logger
 
@@ -12,6 +13,9 @@ _FALLBACK_MODELS = {
     "pro": "gemini-2.5-pro",
     "flash": "gemini-2.5-flash",
 }
+
+# Cache for model shortcuts to avoid repeated parsing
+_model_shortcuts_cache: dict[str, str] | None = None
 
 
 def _get_npm_global_root() -> Path | None:
@@ -39,7 +43,9 @@ def _parse_gemini_models() -> dict[str, str]:
         return _FALLBACK_MODELS
 
     # Try to find the models.js file
-    models_path = npm_root / "@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/config/models.js"
+    gemini_cli_path = "@google/gemini-cli/node_modules/"
+    gemini_core_path = "@google/gemini-cli-core/dist/src/config/models.js"
+    models_path = npm_root / gemini_cli_path / gemini_core_path
 
     if not models_path.exists():
         # Try alternate path without node_modules
@@ -56,13 +62,21 @@ def _parse_gemini_models() -> dict[str, str]:
         models = {}
 
         # Look for DEFAULT_GEMINI_MODEL
-        pro_match = re.search(r"export\s+const\s+DEFAULT_GEMINI_MODEL\s*=\s*['\"]([^'\"]+)['\"]", content)
+        pro_pattern = (
+            r"export\s+const\s+DEFAULT_GEMINI_MODEL\s*=\s*"
+            r"['\"]([^'\"]+)['\"]"
+        )
+        pro_match = re.search(pro_pattern, content)
         if pro_match:
             models["pro"] = pro_match.group(1)
             logger.debug(f"Parsed pro model: {models['pro']}")
 
         # Look for DEFAULT_GEMINI_FLASH_MODEL
-        flash_match = re.search(r"export\s+const\s+DEFAULT_GEMINI_FLASH_MODEL\s*=\s*['\"]([^'\"]+)['\"]", content)
+        flash_pattern = (
+            r"export\s+const\s+DEFAULT_GEMINI_FLASH_MODEL\s*=\s*"
+            r"['\"]([^'\"]+)['\"]"
+        )
+        flash_match = re.search(flash_pattern, content)
         if flash_match:
             models["flash"] = flash_match.group(1)
             logger.debug(f"Parsed flash model: {models['flash']}")
@@ -78,8 +92,19 @@ def _parse_gemini_models() -> dict[str, str]:
         return _FALLBACK_MODELS
 
 
-# Initialize model shortcuts by parsing from Gemini CLI
-MODEL_SHORTCUTS = _parse_gemini_models()
+def get_model_shortcuts() -> dict[str, str]:
+    """Get model shortcuts, parsing from Gemini CLI on first call."""
+    global _model_shortcuts_cache
+    if _model_shortcuts_cache is None:
+        _model_shortcuts_cache = _parse_gemini_models()
+    return _model_shortcuts_cache
+
+
+def __getattr__(name: str) -> Any:
+    """Lazy loading for MODEL_SHORTCUTS."""
+    if name == "MODEL_SHORTCUTS":
+        return get_model_shortcuts()
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 def resolve_model_name(model: str | None) -> str | None:
@@ -95,8 +120,9 @@ def resolve_model_name(model: str | None) -> str | None:
         return None
 
     # Check if it's a known shortcut
-    if model.lower() in MODEL_SHORTCUTS:
-        return MODEL_SHORTCUTS[model.lower()]
+    shortcuts = get_model_shortcuts()
+    if model.lower() in shortcuts:
+        return shortcuts[model.lower()]
 
     # Otherwise pass through as-is
     return model

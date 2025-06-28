@@ -1,7 +1,12 @@
 # this_file: src/geminpy/browser/manager.py
 """Manages default browser settings on macOS."""
 
-import macdefaultbrowsy as mdb
+from macdefaultbrowsy import (
+    get_default_browser,
+    get_browsers,
+    set_default_browser,
+)
+
 from loguru import logger
 
 
@@ -12,7 +17,7 @@ class BrowserManager:
     def get_current_default(cls) -> str | None:
         """Get current default browser identifier."""
         try:
-            return mdb.get_default_browser()
+            return get_default_browser()
         except Exception as e:
             logger.error(f"Failed to get current default browser: {e}")
             return None
@@ -21,7 +26,7 @@ class BrowserManager:
     def get_available_browsers(cls) -> list[str]:
         """List all available browser identifiers."""
         try:
-            return mdb.get_browsers()
+            return get_browsers()
         except Exception as e:
             logger.error(f"Failed to get available browsers: {e}")
             return []
@@ -41,7 +46,7 @@ class BrowserManager:
                 return True
 
             logger.debug(f"Setting default browser to: {browser_id}")
-            mdb.set_default_browser(browser_id)
+            set_default_browser(browser_id)
             return True
         except Exception as e:
             logger.error(f"Failed to set default browser to {browser_id}: {e}")

@@ -25,11 +25,9 @@ class OAuthAutomator:
         logger.debug("Connecting to Chrome over CDP...")
         cdp_url = CDP_VERSION_URL.format(port=self.debug_port)
 
-        async with (
-            aiohttp.ClientSession() as session,
-            session.get(cdp_url) as response,
-        ):
-            info = await response.json()
+        async with aiohttp.ClientSession() as session:
+            async with session.get(cdp_url) as response:
+                info = await response.json()
 
         ws_url = info["webSocketDebuggerUrl"]
         pw = await async_playwright().start()

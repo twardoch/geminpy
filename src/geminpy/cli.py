@@ -8,7 +8,6 @@ import fire
 from rich.console import Console
 
 from geminpy.api import call_gemini_cli
-from geminpy.core.models import MODEL_SHORTCUTS
 
 console = Console()
 
@@ -16,6 +15,7 @@ console = Console()
 def cli(
     quit_browser: bool = False,
     verbose: bool = False,
+    retry: bool = False,
     user: str | None = None,
     gemini_executable: str | Path = "gemini",
     P: bool = False,
@@ -28,13 +28,17 @@ def cli(
 
     Args:
         quit_browser: Quit Chrome after execution
-        verbose: Enable verbose debug logging
+        verbose: Enable verbose debug logging and pass --debug to gemini
+        retry: Enable automatic retry on API failures (rate limits)
         user: Specific user email to use for authentication
         gemini_executable: Path to the gemini executable
         P, Pro: Shortcut for -m 'gemini-2.5-pro'
         F, Flash: Shortcut for -m 'gemini-2.5-flash'
         **gemini_args: Arguments to pass to the gemini CLI
     """
+    # Import MODEL_SHORTCUTS only when needed (after logging setup)
+    from geminpy.core.models import MODEL_SHORTCUTS
+
     # Handle model shortcuts
     if P or Pro:
         if "m" in gemini_args or "model" in gemini_args:
@@ -44,6 +48,13 @@ def cli(
         if "m" in gemini_args or "model" in gemini_args:
             console.print("[yellow]Warning: -F/--Flash overrides any existing -m/--model argument[/yellow]")
         gemini_args["m"] = MODEL_SHORTCUTS["flash"]
+
+    # If verbose is enabled, automatically pass --debug to gemini
+    if verbose:
+        if "debug" in gemini_args:
+            console.print("[yellow]Note: --debug already specified, keeping existing value[/yellow]")
+        else:
+            gemini_args["debug"] = True
 
     # Convert gemini_args dict to CLI argument list
     cli_args = []
@@ -68,6 +79,7 @@ def cli(
             user=user,
             gemini_executable=gemini_executable,
             verbose=verbose,
+            retry=retry,
         )
     )
 

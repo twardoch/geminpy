@@ -11581,70 +11581,70 @@ from unittest.mock import MagicMock, patch
 from geminpy.browser.manager import BrowserManager
 
 
-@patch("geminpy.browser.manager.mdb")
-def test_get_current_default(mock_mdb):
+@patch("geminpy.browser.manager.macdefaultbrowsy")
+def test_get_current_default(mock_macdefaultbrowsy):
     """Verify that get_current_default correctly returns the default browser."""
-    mock_mdb.get_default_browser.return_value = "chrome"
+    mock_macdefaultbrowsy.get_default_browser.return_value = "chrome"
 
     default_browser = BrowserManager.get_current_default()
     assert default_browser == "chrome"
-    mock_mdb.get_default_browser.assert_called_once()
+    mock_macdefaultbrowsy.get_default_browser.assert_called_once()
 
 
-@patch("geminpy.browser.manager.mdb")
-def test_get_current_default_error(mock_mdb):
+@patch("geminpy.browser.manager.macdefaultbrowsy")
+def test_get_current_default_error(mock_macdefaultbrowsy):
     """Verify that get_current_default handles errors gracefully."""
-    mock_mdb.get_default_browser.side_effect = Exception("Test error")
+    mock_macdefaultbrowsy.get_default_browser.side_effect = Exception("Test error")
 
     default_browser = BrowserManager.get_current_default()
     assert default_browser is None
 
 
-@patch("geminpy.browser.manager.mdb")
-def test_get_available_browsers(mock_mdb):
+@patch("geminpy.browser.manager.macdefaultbrowsy")
+def test_get_available_browsers(mock_macdefaultbrowsy):
     """Verify that get_available_browsers correctly returns the browser list."""
-    mock_mdb.get_browsers.return_value = ["safari", "chrome", "firefox"]
+    mock_macdefaultbrowsy.get_browsers.return_value = ["safari", "chrome", "firefox"]
 
     browsers = BrowserManager.get_available_browsers()
     assert browsers == ["safari", "chrome", "firefox"]
-    mock_mdb.get_browsers.assert_called_once()
+    mock_macdefaultbrowsy.get_browsers.assert_called_once()
 
 
-@patch("geminpy.browser.manager.mdb")
-def test_set_default_success(mock_mdb):
+@patch("geminpy.browser.manager.macdefaultbrowsy")
+def test_set_default_success(mock_macdefaultbrowsy):
     """Verify that set_default calls macdefaultbrowsy with the correct arguments."""
     # Mock get_current_default to return different browser
-    mock_mdb.get_default_browser.return_value = "chrome"
-    mock_mdb.set_default_browser.return_value = None
+    mock_macdefaultbrowsy.get_default_browser.return_value = "chrome"
+    mock_macdefaultbrowsy.set_default_browser.return_value = None
 
     result = BrowserManager.set_default("firefox")
     assert result is True
-    mock_mdb.get_default_browser.assert_called_once()
-    mock_mdb.set_default_browser.assert_called_once_with("firefox")
+    mock_macdefaultbrowsy.get_default_browser.assert_called_once()
+    mock_macdefaultbrowsy.set_default_browser.assert_called_once_with("firefox")
 
 
-@patch("geminpy.browser.manager.mdb")
-def test_set_default_already_default(mock_mdb):
+@patch("geminpy.browser.manager.macdefaultbrowsy")
+def test_set_default_already_default(mock_macdefaultbrowsy):
     """Verify that set_default returns True without setting if browser is already default."""
     # Mock get_current_default to return the same browser
-    mock_mdb.get_default_browser.return_value = "firefox"
+    mock_macdefaultbrowsy.get_default_browser.return_value = "firefox"
 
     result = BrowserManager.set_default("firefox")
     assert result is True
-    mock_mdb.get_default_browser.assert_called_once()
-    mock_mdb.set_default_browser.assert_not_called()
+    mock_macdefaultbrowsy.get_default_browser.assert_called_once()
+    mock_macdefaultbrowsy.set_default_browser.assert_not_called()
 
 
-@patch("geminpy.browser.manager.mdb")
-def test_list_browsers(mock_mdb):
+@patch("geminpy.browser.manager.macdefaultbrowsy")
+def test_list_browsers(mock_macdefaultbrowsy):
     """Verify that list_browsers displays browsers with current marked."""
-    mock_mdb.get_browsers.return_value = ["safari", "chrome", "firefox"]
-    mock_mdb.get_default_browser.return_value = "chrome"
+    mock_macdefaultbrowsy.get_browsers.return_value = ["safari", "chrome", "firefox"]
+    mock_macdefaultbrowsy.get_default_browser.return_value = "chrome"
 
     # Just verify it doesn't raise an exception
     BrowserManager.list_browsers()
-    mock_mdb.get_browsers.assert_called_once()
-    mock_mdb.get_default_browser.assert_called_once()
+    mock_macdefaultbrowsy.get_browsers.assert_called_once()
+    mock_macdefaultbrowsy.get_default_browser.assert_called_once()
 </file>
 
 <file path="tests/test_gemini/test_executor.py">
@@ -12356,7 +12356,7 @@ Port the monolithic `work/gemini_wrapper.py` script into a well-structured Pytho
 # this_file: src/geminpy/browser/manager.py
 """Manages default browser settings on macOS."""
 
-import macdefaultbrowsy as mdb
+import macdefaultbrowsy
 from loguru import logger
 
 
@@ -12367,7 +12367,7 @@ class BrowserManager:
     def get_current_default(cls) -> str | None:
         """Get current default browser identifier."""
         try:
-            return mdb.get_default_browser()
+            return macdefaultbrowsy.get_default_browser()
         except Exception as e:
             logger.error(f"Failed to get current default browser: {e}")
             return None
@@ -12376,7 +12376,7 @@ class BrowserManager:
     def get_available_browsers(cls) -> list[str]:
         """List all available browser identifiers."""
         try:
-            return mdb.get_browsers()
+            return macdefaultbrowsy.get_browsers()
         except Exception as e:
             logger.error(f"Failed to get available browsers: {e}")
             return []
@@ -12396,7 +12396,7 @@ class BrowserManager:
                 return True
 
             logger.debug(f"Setting default browser to: {browser_id}")
-            mdb.set_default_browser(browser_id)
+            macdefaultbrowsy.set_default_browser(browser_id)
             return True
         except Exception as e:
             logger.error(f"Failed to set default browser to {browser_id}: {e}")

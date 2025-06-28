@@ -18,6 +18,7 @@ async def call_gemini_cli(
     gemini_executable: str | Path = "gemini",
     quit_browser: bool = False,
     verbose: bool = False,
+    retry: bool = False,
 ) -> str | None:
     """Core function to call gemini CLI with OAuth automation.
 
@@ -27,6 +28,7 @@ async def call_gemini_cli(
         user: Optional specific user email to use for authentication
         gemini_executable: Path to the gemini executable
         verbose: Enable debug logging
+        retry: Enable automatic retry on API failures (rate limits)
 
     Returns:
         Clean response text from Gemini or None if failed
@@ -44,6 +46,7 @@ async def call_gemini_cli(
     config = AppConfig(
         verbose=verbose,
         user_email=user,
+        retry_on_failure=retry,
     )
     config.gemini.executable = gemini_executable
     config.chrome.quit_browser = quit_browser
@@ -58,6 +61,7 @@ async def ask_async(
     user: str | None = None,
     model: str | None = None,
     verbose: bool = False,
+    retry: bool = False,
 ) -> str:
     """Async version of ask.
 
@@ -66,6 +70,7 @@ async def ask_async(
         user: Optional specific user email to use for authentication
         model: Optional model name or shortcut ("pro" for gemini-2.5-pro, "flash" for gemini-2.5-flash)
         verbose: Enable debug logging
+        retry: Enable automatic retry on API failures (rate limits)
 
     Returns:
         Clean text response from Gemini
@@ -80,7 +85,12 @@ async def ask_async(
     if resolved_model:
         gemini_args.extend(["-m", resolved_model])
 
-    response = await call_gemini_cli(gemini_args=gemini_args, user=user, verbose=verbose)
+    response = await call_gemini_cli(
+        gemini_args=gemini_args,
+        user=user,
+        verbose=verbose,
+        retry=retry,
+    )
 
     if response is None:
         msg = "Failed to get response from Gemini"
@@ -94,6 +104,7 @@ def ask(
     user: str | None = None,
     model: str | None = None,
     verbose: bool = False,
+    retry: bool = False,
 ) -> str:
     """Ask Gemini a question and get a clean response.
 
@@ -102,6 +113,7 @@ def ask(
         user: Optional specific user email to use for authentication
         model: Optional model name or shortcut ("pro" for gemini-2.5-pro, "flash" for gemini-2.5-flash)
         verbose: Enable debug logging
+        retry: Enable automatic retry on API failures (rate limits)
 
     Returns:
         Clean text response from Gemini
@@ -109,4 +121,4 @@ def ask(
     Raises:
         GeminiError: If authentication or API call fails
     """
-    return asyncio.run(ask_async(prompt, user, model, verbose))
+    return asyncio.run(ask_async(prompt, user, model, verbose, retry))

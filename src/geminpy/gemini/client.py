@@ -62,8 +62,8 @@ class GeminiClient:
             # Try running gemini with original args
             response = await self._try_gemini_with_oauth(args, resolved_email)
 
-            # Only retry if we got None (failure/rate limit), not empty string (interactive success)
-            if response is None:
+            # Only retry if retry is enabled and we got None (failure/rate limit), not empty string (interactive success)
+            if response is None and self.config.retry_on_failure:
                 # Check if we should retry with flash model
                 if "-m" not in args and "--model" not in args:
                     logger.debug("Rate limit detected, retrying with gemini-2.5-flash model...")
@@ -71,6 +71,8 @@ class GeminiClient:
                     response = await self._try_gemini_with_oauth(flash_args, resolved_email)
                 else:
                     logger.debug("Rate limit detected but model already specified, not retrying")
+            elif response is None and not self.config.retry_on_failure:
+                logger.debug("API failure detected but retry disabled (use --retry to enable)")
 
             # Store successful user for future use (response is not None means success)
             if response is not None and resolved_email:

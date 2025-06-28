@@ -35,6 +35,7 @@ class AppConfig:
     gemini: GeminiConfig = field(default_factory=GeminiConfig)
     user_email: str | None = None
     verbose: bool = False
+    retry_on_failure: bool = False
 
     @property
     def settings_dir(self) -> Path:
