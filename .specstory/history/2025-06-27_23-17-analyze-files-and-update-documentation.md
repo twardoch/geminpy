@@ -3626,7 +3626,7 @@ finition
    |
 14 | async def call_gemini_cli(
 15 |     gemini_args: list[str],
-16 |     quit_chrome: bool = False,
+16 |     quit_browser: bool = False,
    |     ^^^^^^^^^^^ FBT001
 17 |     user: str | None = None,
 18 |     gemini_executable: str | Path = "gemini",
@@ -3637,7 +3637,7 @@ definition
    |
 14 | async def call_gemini_cli(
 15 |     gemini_args: list[str],
-16 |     quit_chrome: bool = False,
+16 |     quit_browser: bool = False,
    |     ^^^^^^^^^^^ FBT002
 17 |     user: str | None = None,
 18 |     gemini_executable: str | Path = "gemini",
@@ -3908,7 +3908,7 @@ src/geminpy/cli.py:16:5: FBT001 Boolean-typed positional argument in function de
 finition
    |
 15 | def cli(
-16 |     quit_chrome: bool = False,
+16 |     quit_browser: bool = False,
    |     ^^^^^^^^^^^ FBT001
 17 |     verbose: bool = False,
 18 |     user: str | None = None,
@@ -3918,7 +3918,7 @@ src/geminpy/cli.py:16:5: FBT002 Boolean default positional argument in function
 definition
    |
 15 | def cli(
-16 |     quit_chrome: bool = False,
+16 |     quit_browser: bool = False,
    |     ^^^^^^^^^^^ FBT002
 17 |     verbose: bool = False,
 18 |     user: str | None = None,
@@ -3928,7 +3928,7 @@ src/geminpy/cli.py:17:5: FBT001 Boolean-typed positional argument in function de
 finition
    |
 15 | def cli(
-16 |     quit_chrome: bool = False,
+16 |     quit_browser: bool = False,
 17 |     verbose: bool = False,
    |     ^^^^^^^ FBT001
 18 |     user: str | None = None,
@@ -3939,7 +3939,7 @@ src/geminpy/cli.py:17:5: FBT002 Boolean default positional argument in function
 definition
    |
 15 | def cli(
-16 |     quit_chrome: bool = False,
+16 |     quit_browser: bool = False,
 17 |     verbose: bool = False,
    |     ^^^^^^^ FBT002
 18 |     user: str | None = None,
@@ -3953,7 +3953,7 @@ src/geminpy/core/config.py:16:32: S108 Probable insecure usage of temporary file
 15 |     debug_port: int = 9222
 16 |     user_data_dir: Path = Path("/tmp/chrome_gemini_automation")
    |                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ S108
-17 |     quit_chrome: bool = False
+17 |     quit_browser: bool = False
    |
 
 src/geminpy/core/constants.py:19:16: RUF012 Mutable class attributes should be a

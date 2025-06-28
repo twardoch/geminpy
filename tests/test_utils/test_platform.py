@@ -49,7 +49,7 @@ def test_check_dependencies_success():
         with patch("geminpy.utils.platform.require_command") as mock_require_command:
             check_dependencies()
             assert mock_require_macos.called
-            assert mock_require_command.call_count == 2  # macdefaultbrowsy and npx
+            assert mock_require_command.call_count == 1  # Only npx now
 
 
 def test_check_dependencies_missing_command():

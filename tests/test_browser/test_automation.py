@@ -2,7 +2,7 @@
 """Tests for the OAuthAutomator."""
 
 import os
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 
@@ -26,6 +26,7 @@ class TestUserResolver:
 
     def test_resolve_user_email_settings_priority(self):
         """Verify stored settings have third priority."""
+
         def mock_getter():
             return "stored@example.com"
 
@@ -51,15 +52,24 @@ class TestOAuthAutomator:
         automator = OAuthAutomator()
         assert automator.debug_port == 9222
 
-    @patch("geminpy.browser.automation.requests.get")
+    @patch("geminpy.browser.automation.aiohttp.ClientSession")
     @patch("geminpy.browser.automation.async_playwright")
     @pytest.mark.asyncio
-    async def test_connect_playwright_success(self, mock_playwright, mock_get):
+    async def test_connect_playwright_success(self, mock_playwright, mock_session_class):
         """Test successful Playwright connection to Chrome."""
-        # Mock the CDP version endpoint
-        mock_get.return_value.json.return_value = {
-            "webSocketDebuggerUrl": "ws://localhost:9222/devtools/browser"
-        }
+        # Mock the aiohttp ClientSession and response
+        mock_response = AsyncMock()
+        mock_response.json = AsyncMock(return_value={"webSocketDebuggerUrl": "ws://localhost:9222/devtools/browser"})
+
+        mock_session = AsyncMock()
+        mock_session.get = AsyncMock(return_value=mock_response)
+        mock_session.__aenter__ = AsyncMock(return_value=mock_session)
+        mock_session.__aexit__ = AsyncMock(return_value=None)
+
+        mock_response.__aenter__ = AsyncMock(return_value=mock_response)
+        mock_response.__aexit__ = AsyncMock(return_value=None)
+
+        mock_session_class.return_value = mock_session
 
         # Mock Playwright components
         mock_pw = AsyncMock()
@@ -82,17 +92,24 @@ class TestOAuthAutomator:
         mock_page.bring_to_front.assert_called_once()
 
     @patch("geminpy.browser.automation.asyncio.sleep", new_callable=AsyncMock)
-    @patch("geminpy.browser.automation.requests.get")
+    @patch("geminpy.browser.automation.aiohttp.ClientSession")
     @patch("geminpy.browser.automation.async_playwright")
     @pytest.mark.asyncio
-    async def test_connect_playwright_no_oauth_page(
-        self, mock_playwright, mock_get, mock_sleep
-    ):
+    async def test_connect_playwright_no_oauth_page(self, mock_playwright, mock_session_class, mock_sleep):
         """Test failure when no OAuth page is found."""
-        # Mock the CDP version endpoint
-        mock_get.return_value.json.return_value = {
-            "webSocketDebuggerUrl": "ws://localhost:9222/devtools/browser"
-        }
+        # Mock the aiohttp ClientSession and response
+        mock_response = AsyncMock()
+        mock_response.json = AsyncMock(return_value={"webSocketDebuggerUrl": "ws://localhost:9222/devtools/browser"})
+
+        mock_session = AsyncMock()
+        mock_session.get = AsyncMock(return_value=mock_response)
+        mock_session.__aenter__ = AsyncMock(return_value=mock_session)
+        mock_session.__aexit__ = AsyncMock(return_value=None)
+
+        mock_response.__aenter__ = AsyncMock(return_value=mock_response)
+        mock_response.__aexit__ = AsyncMock(return_value=None)
+
+        mock_session_class.return_value = mock_session
 
         # Mock Playwright components
         mock_pw = AsyncMock()

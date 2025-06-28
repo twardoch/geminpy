@@ -6,6 +6,7 @@ from pathlib import Path
 
 from geminpy.core.config import AppConfig
 from geminpy.core.exceptions import GeminiError
+from geminpy.core.models import resolve_model_name
 from geminpy.gemini.client import GeminiClient
 from geminpy.utils.logging import setup_logging
 from geminpy.utils.platform import check_dependencies
@@ -13,16 +14,16 @@ from geminpy.utils.platform import check_dependencies
 
 async def call_gemini_cli(
     gemini_args: list[str],
-    quit_chrome: bool = False,
     user: str | None = None,
     gemini_executable: str | Path = "gemini",
+    quit_browser: bool = False,
     verbose: bool = False,
 ) -> str | None:
     """Core function to call gemini CLI with OAuth automation.
 
     Args:
         gemini_args: Arguments to pass to the gemini CLI
-        quit_chrome: Whether to quit Chrome after execution
+        quit_browser: Whether to quit Chrome after execution
         user: Optional specific user email to use for authentication
         gemini_executable: Path to the gemini executable
         verbose: Enable debug logging
@@ -45,7 +46,7 @@ async def call_gemini_cli(
         user_email=user,
     )
     config.gemini.executable = gemini_executable
-    config.chrome.quit_chrome = quit_chrome
+    config.chrome.quit_browser = quit_browser
 
     # Create and run client
     client = GeminiClient(config)
@@ -55,6 +56,7 @@ async def call_gemini_cli(
 async def ask_async(
     prompt: str,
     user: str | None = None,
+    model: str | None = None,
     verbose: bool = False,
 ) -> str:
     """Async version of ask.
@@ -62,6 +64,7 @@ async def ask_async(
     Args:
         prompt: The question/prompt to ask
         user: Optional specific user email to use for authentication
+        model: Optional model name or shortcut ("pro" for gemini-2.5-pro, "flash" for gemini-2.5-flash)
         verbose: Enable debug logging
 
     Returns:
@@ -71,9 +74,13 @@ async def ask_async(
         GeminiError: If authentication or API call fails
     """
     gemini_args = ["-p", prompt]
-    response = await call_gemini_cli(
-        gemini_args=gemini_args, user=user, verbose=verbose
-    )
+
+    # Add model argument if specified
+    resolved_model = resolve_model_name(model)
+    if resolved_model:
+        gemini_args.extend(["-m", resolved_model])
+
+    response = await call_gemini_cli(gemini_args=gemini_args, user=user, verbose=verbose)
 
     if response is None:
         msg = "Failed to get response from Gemini"
@@ -85,6 +92,7 @@ async def ask_async(
 def ask(
     prompt: str,
     user: str | None = None,
+    model: str | None = None,
     verbose: bool = False,
 ) -> str:
     """Ask Gemini a question and get a clean response.
@@ -92,6 +100,7 @@ def ask(
     Args:
         prompt: The question/prompt to ask
         user: Optional specific user email to use for authentication
+        model: Optional model name or shortcut ("pro" for gemini-2.5-pro, "flash" for gemini-2.5-flash)
         verbose: Enable debug logging
 
     Returns:
@@ -100,4 +109,4 @@ def ask(
     Raises:
         GeminiError: If authentication or API call fails
     """
-    return asyncio.run(ask_async(prompt, user, verbose))
+    return asyncio.run(ask_async(prompt, user, model, verbose))

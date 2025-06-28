@@ -158,7 +158,7 @@ Read file: work/gemini_wrapper.py
 +     gemini_args=["-m", "gemini-pro", "-p", "Your prompt here"],
 +     user="specific@email.com",
 +     verbose=True,
-+     quit_chrome=True
++     quit_browser=True
 + )
 + ```
 + 

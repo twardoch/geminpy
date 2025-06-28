@@ -1,0 +1,11 @@
+1. 
+
+When we run the tool for the very first time and settings.json does not exist, the tool currently installs the Chrome for Testing browser, is that right? 
+
+If that is happening, then before we save settings.json, we need to give the user the chance to also fill in the `gemini_cli_user` setting (interactively). The user can input it, and then the setting gets saved, and if the user just presses Enter (we get nothing), then the setting gets NOT saved in the settings.json
+
+Got it?
+
+2. 
+
+`src/geminpy/utils/platform.py` has all these checks, tries etc. for macdefaultbrowsy being or not being available. Streamline that, clean it up. We just import macdefaultbrowsy because that's in our project requirements. We don't need to check its existence on every step. 

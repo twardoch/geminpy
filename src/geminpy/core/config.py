@@ -14,7 +14,7 @@ class ChromeConfig:
     executable_path: Path | None = None
     debug_port: int = 9222
     user_data_dir: Path = Path("/tmp/chrome_gemini_automation")
-    quit_chrome: bool = False
+    quit_browser: bool = False
 
 
 @dataclass

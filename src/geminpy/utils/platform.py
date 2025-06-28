@@ -26,5 +26,4 @@ def require_command(command: str, install_hint: str) -> None:
 def check_dependencies() -> None:
     """Verify all required dependencies are available."""
     require_macos()
-    require_command("macdefaultbrowsy", "Install with: brew install macdefaultbrowsy")
     require_command("npx", "Install Node.js from https://nodejs.org")

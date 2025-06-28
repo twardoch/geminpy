@@ -136,7 +136,7 @@ async def main():
         gemini_args=["-m", "gemini-pro", "-p", "Your prompt"],
         user="your.email@gmail.com",
         verbose=True,
-        quit_chrome=True
+        quit_browser=True
     )
     print(response)
 

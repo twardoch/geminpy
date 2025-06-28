@@ -40,6 +40,26 @@ class ChromeTestingManager:
         """Store the gemini CLI user email."""
         self.settings.set("gemini_cli_user", user_email)
 
+    def _prompt_for_user_email(self) -> None:
+        """Interactively prompt for user email during first-time setup."""
+        from rich.console import Console
+        from rich.prompt import Prompt
+
+        console = Console()
+        console.print("\n[bold yellow]First-time setup:[/bold yellow] Chrome for Testing has been installed.")
+        console.print("You can optionally set your default Google account email for Gemini CLI.")
+        console.print("This will be used to automatically select your account during OAuth.")
+
+        email = Prompt.ask(
+            "\n[cyan]Enter your Google account email (or press Enter to skip)[/cyan]", default="", show_default=False
+        )
+
+        if email.strip():
+            self.set_stored_user(email.strip())
+            console.print(f"[green]✓ Saved default account: {email.strip()}[/green]")
+        else:
+            console.print("[dim]No default account set. You'll need to select an account each time.[/dim]")
+
     def install(self) -> Path:
         """Install Chrome for Testing and return the executable path."""
         logger.debug("Installing Chrome for Testing...")
@@ -81,6 +101,11 @@ class ChromeTestingManager:
 
         logger.debug(f"Chrome for Testing installed at: {executable_path}")
         self.set_stored_path(path)
+
+        # Prompt for user email when creating settings for the first time
+        if not self.get_stored_user():
+            self._prompt_for_user_email()
+
         return path
 
     def ensure_available(self) -> Path:

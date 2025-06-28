@@ -29,14 +29,10 @@ class GeminiClient:
         self.executor = GeminiExecutor(config.gemini.executable)
         self.parser = ResponseParser()
 
-    async def execute_with_auth(
-        self, args: list[str], user_email: str | None = None
-    ) -> str | None:
+    async def execute_with_auth(self, args: list[str], user_email: str | None = None) -> str | None:
         """Execute Gemini CLI with automatic OAuth handling."""
         # Resolve user email
-        resolved_email = UserResolver.resolve_user_email(
-            user_email, self.chrome_testing_manager.get_stored_user
-        )
+        resolved_email = UserResolver.resolve_user_email(user_email, self.chrome_testing_manager.get_stored_user)
 
         # Save original browser
         orig_browser = self.browser_manager.get_current_default()
@@ -66,23 +62,18 @@ class GeminiClient:
             # Try running gemini with original args
             response = await self._try_gemini_with_oauth(args, resolved_email)
 
+            # Only retry if we got None (failure/rate limit), not empty string (interactive success)
             if response is None:
                 # Check if we should retry with flash model
                 if "-m" not in args and "--model" not in args:
-                    logger.debug(
-                        "Rate limit detected, retrying with gemini-2.5-flash model..."
-                    )
+                    logger.debug("Rate limit detected, retrying with gemini-2.5-flash model...")
                     flash_args = ["-m", "gemini-2.5-flash", *args]
-                    response = await self._try_gemini_with_oauth(
-                        flash_args, resolved_email
-                    )
+                    response = await self._try_gemini_with_oauth(flash_args, resolved_email)
                 else:
-                    logger.debug(
-                        "Rate limit detected but model already specified, not retrying"
-                    )
+                    logger.debug("Rate limit detected but model already specified, not retrying")
 
-            # Store successful user for future use
-            if response and resolved_email:
+            # Store successful user for future use (response is not None means success)
+            if response is not None and resolved_email:
                 self.chrome_testing_manager.set_stored_user(resolved_email)
 
             return response
@@ -94,17 +85,18 @@ class GeminiClient:
                 logger.debug(f"Restored default browser to {orig_browser}")
 
             # Optionally quit Chrome
-            if chrome_proc and chrome_proc.poll() is None and self.config.chrome.quit_chrome:
+            if chrome_proc and chrome_proc.poll() is None and self.config.chrome.quit_browser:
                 logger.debug("Quitting Chrome for Testing as requested.")
                 chrome_proc.terminate()
                 await asyncio.sleep(1)
 
-    async def _try_gemini_with_oauth(
-        self, args: list[str], user_email: str | None
-    ) -> str | None:
+    async def _try_gemini_with_oauth(self, args: list[str], user_email: str | None) -> str | None:
         """Try running gemini with OAuth automation."""
+        # Check if this is interactive mode (no -p argument)
+        is_interactive = "-p" not in args and "--prompt" not in args
+
         # Start Gemini CLI process
-        proc, _, _ = await self.executor.execute(args, self.config.gemini.timeout)
+        proc, _, _ = await self.executor.execute(args, self.config.gemini.timeout, interactive=is_interactive)
 
         # Run OAuth automation
         logger.debug("Starting OAuth automation flow...")
@@ -116,7 +108,21 @@ class GeminiClient:
             proc.terminate()
             return None
 
-        # Monitor for rate limits
+        # For interactive mode, we need to handle I/O differently
+        if is_interactive:
+            logger.debug("Running in interactive mode - showing full gemini output")
+            # Don't monitor for rate limits in interactive mode
+            # Just wait for the process to complete naturally
+            try:
+                # Let the process run interactively
+                await proc.wait()
+                # Return empty string to indicate success without parsing
+                return ""
+            except Exception as e:
+                logger.debug(f"Interactive mode error: {e}")
+                return None
+
+        # Non-interactive mode - continue with normal flow
         logger.debug("Waiting for gemini process to complete...")
         rate_limit_detected, stderr_lines = await self.executor.monitor_process(proc)
 
@@ -127,9 +133,7 @@ class GeminiClient:
 
         # Wait for completion
         try:
-            stdout, stderr = await self.executor.wait_completion(
-                proc, self.config.gemini.timeout
-            )
+            stdout, stderr = await self.executor.wait_completion(proc, self.config.gemini.timeout)
 
             if stderr:
                 stderr_lines.append(stderr)

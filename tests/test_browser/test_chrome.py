@@ -48,19 +48,22 @@ def test_ensure_available_with_stored_path(mock_exists, chrome_testing_manager):
 
 @patch("geminpy.browser.chrome.subprocess.run")
 @patch("geminpy.browser.manager.BrowserManager.get_available_browsers", return_value=[])
-def test_ensure_available_installs_if_needed(
-    mock_browsers, mock_run, chrome_testing_manager, tmp_path
-):
+def test_ensure_available_installs_if_needed(mock_browsers, mock_run, chrome_testing_manager, tmp_path):
     """Verify that ensure_available installs Chrome if it's not found."""
     install_path = tmp_path / "chrome"
     mock_run.return_value.stdout = f"chrome@stable {install_path}"
 
     # Mock the path's existence to avoid a FileNotFoundError in the test
-    with patch.object(Path, "exists", return_value=True):
+    # Also mock the prompt to avoid interactive input during test
+    with (
+        patch.object(Path, "exists", return_value=True),
+        patch("rich.prompt.Prompt.ask", return_value="test@example.com"),
+    ):
         result_path = chrome_testing_manager.install()
 
     assert result_path == install_path
     assert chrome_testing_manager.get_stored_path() == install_path
+    assert chrome_testing_manager.get_stored_user() == "test@example.com"
 
 
 @patch("subprocess.Popen")
@@ -71,9 +74,7 @@ def test_chrome_manager_launch(mock_popen, chrome_manager, tmp_path):
     mock_popen.assert_called_once()
     args, _ = mock_popen.call_args
     assert str(executable_path) in args[0]
-    assert (
-        f"--remote-debugging-port={chrome_manager.config.debug_port}" in args[0]
-    )
+    assert f"--remote-debugging-port={chrome_manager.config.debug_port}" in args[0]
 
 
 @patch("requests.get")
@@ -89,9 +90,7 @@ def test_chrome_manager_is_cdp_ready(mock_get, chrome_manager):
 @patch("requests.get")
 @patch("asyncio.sleep", new_callable=MagicMock)
 @pytest.mark.asyncio
-async def test_chrome_manager_wait_for_cdp(
-    mock_sleep, mock_get, chrome_manager
-):
+async def test_chrome_manager_wait_for_cdp(mock_sleep, mock_get, chrome_manager):
     """Verify that wait_for_cdp waits for a successful connection."""
     mock_get.return_value.status_code = 200
     await chrome_manager.wait_for_cdp()

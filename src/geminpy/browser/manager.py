@@ -1,32 +1,18 @@
 # this_file: src/geminpy/browser/manager.py
 """Manages default browser settings on macOS."""
 
-import subprocess
-
+import macdefaultbrowsy as mdb
 from loguru import logger
-
-from geminpy.utils.platform import require_command
 
 
 class BrowserManager:
     """Manages default browser settings on macOS."""
 
-    @staticmethod
-    def _require_defaultbrowser() -> None:
-        """Ensure macdefaultbrowsy utility is available."""
-        require_command("macdefaultbrowsy", "Install with: brew install macdefaultbrowsy")
-
     @classmethod
     def get_current_default(cls) -> str | None:
         """Get current default browser identifier."""
         try:
-            cls._require_defaultbrowser()
-            result = subprocess.run(["macdefaultbrowsy"], capture_output=True, text=True, check=True)
-            for line in result.stdout.splitlines():
-                line = line.strip()
-                if line and line.startswith("* "):
-                    return line[2:]
-            return result.stdout.splitlines()[0].strip() if result.stdout.splitlines() else None
+            return mdb.get_default_browser()
         except Exception as e:
             logger.error(f"Failed to get current default browser: {e}")
             return None
@@ -35,14 +21,7 @@ class BrowserManager:
     def get_available_browsers(cls) -> list[str]:
         """List all available browser identifiers."""
         try:
-            cls._require_defaultbrowser()
-            result = subprocess.run(["macdefaultbrowsy"], capture_output=True, text=True, check=True)
-            browsers = []
-            for line in result.stdout.splitlines():
-                line = line.strip()
-                if line:
-                    browsers.append(line[2:] if line.startswith("* ") else line)
-            return browsers
+            return mdb.get_browsers()
         except Exception as e:
             logger.error(f"Failed to get available browsers: {e}")
             return []
@@ -55,8 +34,6 @@ class BrowserManager:
             bool: True if successful, False otherwise.
         """
         try:
-            cls._require_defaultbrowser()
-
             # Check if browser is already default to prevent hanging
             current_default = cls.get_current_default()
             if current_default == browser_id:
@@ -64,7 +41,7 @@ class BrowserManager:
                 return True
 
             logger.debug(f"Setting default browser to: {browser_id}")
-            subprocess.run(["macdefaultbrowsy", browser_id], check=True)
+            mdb.set_default_browser(browser_id)
             return True
         except Exception as e:
             logger.error(f"Failed to set default browser to {browser_id}: {e}")
@@ -74,9 +51,12 @@ class BrowserManager:
     def list_browsers(cls) -> None:
         """List all available browsers, marking the default with a *."""
         try:
-            cls._require_defaultbrowser()
-            result = subprocess.run(["macdefaultbrowsy"], capture_output=True, text=True, check=True)
-            for line in result.stdout.splitlines():
-                logger.info(line.strip())
+            browsers = cls.get_available_browsers()
+            current = cls.get_current_default()
+            for browser in browsers:
+                if browser == current:
+                    logger.info(f"* {browser}")
+                else:
+                    logger.info(f"  {browser}")
         except Exception as e:
             logger.error(f"Failed to list browsers: {e}")
