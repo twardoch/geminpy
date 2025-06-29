@@ -2,292 +2,263 @@
 
 **Automated OAuth wrapper for Google's Gemini CLI on macOS**
 
-`geminpy` eliminates the manual authentication steps required by Google's `gemini` CLI tool. It automatically handles the entire OAuth flow - from browser management to account selection - letting you use Gemini programmatically without interruption.
+`geminpy` streamlines your interaction with Google's `gemini` CLI by automating the often-manual OAuth 2.0 authentication process. Designed for macOS users, it intelligently manages browser contexts and handles common CLI challenges, allowing for uninterrupted programmatic use and scripting.
 
-## Why It Exists
+## Why `geminpy`?
 
-Google's official `gemini` CLI requires manual OAuth authentication through a web browser each time you use it. This makes automation impossible and interrupts workflows. `geminpy` solves this by:
+Google's official `gemini` CLI requires users to manually authenticate through a web browser. This is cumbersome for frequent use and a blocker for automation. `geminpy` solves this by:
 
-1. **Automating the OAuth dance** - No manual clicking through Google's authentication screens
-2. **Managing browser contexts** - Uses isolated Chrome for Testing to avoid conflicts
-3. **Handling rate limits gracefully** - Automatically retries with flash model when rate limited
-4. **Providing clean outputs** - Filters authentication noise from responses
+1.  **Automating the OAuth Dance**: No more clicking through Google's sign-in screens.
+2.  **Isolating Browser Sessions**: Uses a dedicated Chrome for Testing instance, keeping your main browser profile untouched.
+3.  **Handling Rate Limits Gracefully**: Detects API rate limits and can automatically retry with a less demanding model.
+4.  **Providing Clean Output**: Filters authentication-related messages, giving you just the Gemini model's response.
 
-## What It Does
+## Target Audience
 
-`geminpy` acts as a transparent wrapper around the official `gemini` CLI, adding automation capabilities:
+`geminpy` is for developers, scripters, and anyone on macOS who frequently uses the Gemini CLI and wants a smoother, automatable experience.
 
-- **Drop-in CLI replacement**: Use it exactly like the original `gemini` command
-- **Programmatic API**: Call Gemini from Python code with `ask()` function
-- **Multi-language support**: Handles OAuth pages in 9+ languages
-- **Smart user detection**: Remembers your preferred Google account
-- **Rate limit resilience**: Automatic fallback to `gemini-2.5-flash` when quota exceeded
-- **Browser isolation**: Uses Chrome for Testing to avoid disrupting your main browser
+## Key Features
 
-## How It Works
+*   **Transparent CLI Wrapper**: Use `geminpy` as a drop-in replacement for the `gemini` command.
+*   **Programmatic API**: Integrate Gemini into your Python scripts with a simple `ask()` function.
+*   **Multi-Language OAuth**: Successfully navigates OAuth pages in English, Polish, French, German, Spanish, Italian, Russian, Japanese, and Chinese.
+*   **Smart User Account Management**:
+    *   Remembers your preferred Google account.
+    *   Prompts for email during first-time setup.
+    *   Resolves user via CLI arguments, environment variables, or stored settings.
+*   **Rate Limit Resilience**: Automatically falls back to `gemini-2.5-flash` if the default model hits a quota.
+*   **Chrome for Testing Management**:
+    *   Automatically installs Chrome for Testing if not found.
+    *   Manages its execution and remote debugging connection.
+*   **Dynamic Model Aliases**: Uses official model names for "pro" and "flash" by parsing your local Gemini CLI installation, ensuring aliases stay current.
 
-### Technical Architecture
+## Requirements
 
-The package orchestrates several components to achieve seamless automation:
-
-```
-User Request → GeminiClient → Browser Setup → OAuth Automation → Gemini CLI → Response
-                     ↓              ↓               ↓                ↓
-              BrowserManager  ChromeManager  OAuthAutomator  GeminiExecutor
-                     ↓              ↓               ↓                ↓
-              macdefaultbrowsy  Chrome CDP    Playwright      subprocess
-```
-
-### Automation Flow
-
-1. **Browser Preparation**
-
-   - Installs Chrome for Testing if needed (via `@puppeteer/browsers`)
-   - Saves current default browser
-   - Temporarily switches to Chrome for Testing
-
-2. **OAuth Automation**
-
-   - Launches Chrome with remote debugging (`--remote-debugging-port=9222`)
-   - Starts `gemini` CLI which opens OAuth URL
-   - Playwright connects via Chrome DevTools Protocol
-   - Automatically clicks your Google account
-   - Detects and clicks sign-in button (multi-language, multi-strategy)
-   - Waits for authentication success
-
-3. **Execution & Monitoring**
-
-   - Monitors gemini process output in real-time
-   - Detects rate limits (429, quota exceeded, etc.)
-   - Automatically retries with fallback model if needed
-   - Extracts clean response from CLI output
-
-4. **Cleanup**
-   - Restores original default browser
-   - Optionally quits Chrome
-   - Returns pure response text
-
-### Key Components
-
-- **`browser.manager`**: Controls macOS default browser via `macdefaultbrowsy`
-- **`browser.chrome`**: Manages Chrome for Testing installation and lifecycle
-- **`browser.automation`**: Playwright-based OAuth flow automation
-- **`gemini.client`**: Main orchestrator coordinating all components
-- **`gemini.executor`**: Subprocess management with real-time monitoring
-- **`gemini.parser`**: Response extraction and cleaning
+*   **Platform**: macOS (Darwin)
+*   **Python**: 3.10 or newer
+*   **Playwright Browsers**: A one-time setup is needed for Playwright's browser automation.
+    ```bash
+    playwright install chromium
+    ```
 
 ## Installation
 
-### Prerequisites
-
-**macOS only** - Browser automation requires macOS-specific tools.
-
-# Install geminpy
+Install `geminpy` using `uv` (or `pip`):
 
 ```bash
 uv pip install geminpy
 ```
 
-One-time setup: Install Playwright browsers
+## Quick Start
+
+### Command-Line Interface (CLI)
+
+Use `geminpy` just like you would use `gemini`:
 
 ```bash
-playwright install chromium
+# Basic prompt
+geminpy -p "Explain the theory of relativity in simple terms."
+
+# Use model shortcuts (Pro or Flash)
+geminpy -P -p "Write a Python function for factorial."  # Uses Gemini Pro
+geminpy -F -p "What's the capital of France?"          # Uses Gemini Flash
+
+# Enable verbose logging for debugging
+geminpy --verbose -p "Hello world"
+
+# Automatically quit the automation browser when done
+geminpy --quit-chrome -p "A quick question"
 ```
 
-## Usage
+### Programmatic API
 
-### CLI Usage
-
-Use exactly like the original `gemini` CLI:
-
-```bash
-# Ask a question
-geminpy -p "Explain Python decorators"
-
-# Use specific model with new shortcuts
-geminpy -P -p "Write a Python function"  # Uses gemini-2.5-pro
-geminpy -F -p "Quick question"           # Uses gemini-2.5-flash
-
-# Traditional model selection still works
-geminpy -m "gemini-pro" -p "Complex analysis"
-
-# Enable verbose logging
-geminpy --verbose -p "Debug this"
-
-# Quit Chrome after completion
-geminpy --quit-chrome -p "One-off query"
-```
-
-### Programmatic Usage
+Integrate Gemini into your Python scripts:
 
 ```python
 from geminpy import ask
 
-# Simple question-answer
-response = ask("Explain quantum computing")
+# Simple query
+response = ask("What is the main ingredient in bread?")
 print(response)
 
-# Async usage with full control
+# Query with a specific model (e.g., "pro" or "flash")
+pro_response = ask("Suggest three innovative uses for AI in education.", model="pro")
+print(pro_response)
+
+# For more advanced control (async)
 import asyncio
 from geminpy import call_gemini_cli
 
-async def main():
+async def advanced_query():
     response = await call_gemini_cli(
-        gemini_args=["-m", "gemini-pro", "-p", "Your prompt"],
-        user="your.email@gmail.com",
+        gemini_args=["-m", "gemini-1.5-ultra", "-p", "Elaborate on dark matter."],
+        user="your.email@example.com", # Optional: specify user
         verbose=True,
         quit_browser=True
     )
-    print(response)
+    if response is not None:
+        print(response)
+    else:
+        print("Failed to get a response.")
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(advanced_query())
 ```
 
-## Configuration
+## User Account Configuration
 
-### User Account Resolution
+`geminpy` resolves the Google account for OAuth in the following order of priority:
 
-`geminpy` determines which Google account to use in this priority order:
+1.  **`--user` CLI Argument**: e.g., `geminpy --user="you@example.com" -p "Hello"`
+2.  **`GEMINI_CLI_USER` Environment Variable**: e.g., `export GEMINI_CLI_USER="you@example.com"`
+3.  **Stored Setting**: From `settings.json`, saved from a previous successful authentication or first-time setup.
+4.  **First Available Account**: If none of the above are specified, `geminpy` will attempt to use the first Google account it detects on the OAuth page.
 
-1. **CLI argument**: `--user="you@gmail.com"`
-2. **Environment variable**: `GEMINI_CLI_USER="you@gmail.com"`
-3. **Stored settings**: From previous successful authentication
-4. **First available**: Uses first Google account found
-
-### Settings Storage
-
-Settings are automatically persisted to:
-
-```
-~/Library/Application Support/com.twardoch.chrometesting/settings.json
-```
-
-Contains:
-
-- Chrome for Testing executable path
-- Last used Google account email
-
-## Advanced Features
-
-### Multi-Language OAuth Support
-
-Detects sign-in buttons in multiple languages:
-
-- English, Polish, French, German, Spanish
-- Italian, Russian, Japanese, Chinese
-- Falls back to attribute and style-based detection
-
-### Rate Limit Handling
-
-Automatic detection and retry logic:
-
-```
-Original request → Rate limit detected → Retry with gemini-2.5-flash → Final response
-```
-
-### Browser Isolation
-
-- Uses dedicated Chrome for Testing instance
-- Preserves your regular browser state
-- No profile contamination
-- Clean OAuth every time
+During the first-time setup (when Chrome for Testing is installed), `geminpy` will interactively prompt you to enter your preferred Google account email.
 
 ## Troubleshooting
 
-### Common Issues
+*   **"Chrome CDP did not become available"**:
+    *   Another Chrome instance might be running without remote debugging.
+    *   Check if port 9222 is blocked: `curl http://localhost:9222/json/version`.
+    *   Examine Chrome's error log: `/tmp/gemini_chrome_stderr.log`.
+*   **"Could not find sign-in button" / Authentication Fails**:
+    *   Run with `--verbose` to see detailed OAuth flow logs.
+    *   Check screenshots saved on error (e.g., `oauth_error.png`, `oauth_error_no_signin.png`).
+    *   Ensure your Google account has access to Gemini services.
+*   **Rate Limits Persist**:
+    *   `geminpy` automatically tries `gemini-2.5-flash` on rate limits.
+    *   If issues continue, wait a few minutes or check your Gemini API quota in the Google Cloud Console.
 
-**"Chrome CDP did not become available"**
+## Technical Deep Dive
 
-- Check if port 9222 is available: `lsof -i :9222`
-- Look at Chrome logs: `/tmp/gemini_chrome_stderr.log`
+### How It Works: The Automation Flow
 
-**"Could not find sign-in button"**
+1.  **Initialization & Setup**:
+    *   `GeminiClient` is initialized.
+    *   Dependencies (`npx`) are checked via `check_dependencies`.
+    *   User email is resolved by `UserResolver`.
+    *   Model name (if using shortcuts like "pro" or "flash") is resolved by `resolve_model_name`, which dynamically parses Google's official Gemini CLI's `models.js` file to get the current default model names.
 
-- Enable verbose mode: `--verbose`
-- Check screenshots: `oauth_error.png`, `oauth_error_no_signin.png`
-- Ensure your Google account has Gemini access
+2.  **Browser Preparation**:
+    *   `ChromeTestingManager` ensures Chrome for Testing is available. If not found or its path isn't stored, it installs it using `npx @puppeteer/browsers install chrome@stable --platform mac --path /Applications`. If this is the first time, it prompts for a default Google user email.
+    *   `BrowserManager` (utilizing the `macdefaultbrowsy` Python package) saves the current macOS default browser.
+    *   It then sets Chrome for Testing as the temporary default browser. This is crucial for the `gemini` CLI to open its OAuth URL in the correct, controlled browser instance.
 
-### Debug Mode
+3.  **Chrome Launch & Connection**:
+    *   `ChromeManager` launches the Chrome for Testing executable with remote debugging enabled on a specific port (default 9222).
+    *   It waits for the Chrome DevTools Protocol (CDP) endpoint to become available.
 
-Enable comprehensive logging:
+4.  **Gemini CLI and OAuth Trigger**:
+    *   `GeminiExecutor` starts the `gemini` CLI as a subprocess. The CLI attempts to open an OAuth authentication URL in the (now) default browser (Chrome for Testing).
 
-```bash
-geminpy --verbose -p "Your question"
-```
+5.  **OAuth Automation via Playwright**:
+    *   `OAuthAutomator` connects to the running Chrome for Testing instance via Playwright over the CDP.
+    *   It identifies the Google OAuth page.
+    *   **Account Selection**: It clicks the specified user account. If no user is specified, it attempts to click the first available account.
+    *   **Sign-In**: It locates and clicks the "Sign in" (or equivalent in other languages) button. This step uses robust selectors like `id="submit_approve_access"` or `jsname="uRHG6"` first, falling back to other strategies if needed.
+    *   It waits for the success redirect URL.
 
-Shows:
+6.  **Execution Monitoring & Response Handling**:
+    *   `GeminiExecutor` monitors the `gemini` CLI's output.
+    *   If a rate limit is detected in the output, `GeminiClient` can automatically retry the command using the `gemini-2.5-flash` model (if no model was originally specified).
+    *   `ResponseParser` cleans the raw output from the CLI, removing authentication-related messages to provide just the model's response.
 
-- Chrome installation progress
-- Browser switching operations
-- OAuth automation steps
-- Gemini CLI interactions
-- Response parsing details
-
-## Development
+7.  **Cleanup**:
+    *   `BrowserManager` restores the original macOS default browser.
+    *   If the `--quit-chrome` flag was used, `ChromeManager` terminates the Chrome for Testing process.
 
 ### Project Structure
 
 ```
 src/geminpy/
-├── browser/          # Browser automation components
-│   ├── automation.py # OAuth flow automation
-│   ├── chrome.py     # Chrome for Testing management
-│   └── manager.py    # Default browser control
-├── gemini/           # Gemini CLI integration
-│   ├── client.py     # Main orchestrator
-│   ├── executor.py   # Process management
-│   └── parser.py     # Response extraction
-├── core/             # Core utilities
-│   ├── config.py     # Configuration
-│   ├── constants.py  # Constants
-│   └── exceptions.py # Custom exceptions
-├── utils/            # Utilities
-│   ├── platform.py   # Platform checks
-│   └── storage.py    # Settings persistence
-├── api.py            # Public API
-└── cli.py            # CLI interface
+├── api.py            # Public functions (ask, call_gemini_cli)
+├── cli.py            # Command-Line Interface logic (using Fire)
+├── __init__.py       # Package entry point
+├── __main__.py       # For `python -m geminpy`
+├── browser/
+│   ├── automation.py # OAuthAutomator: Playwright logic
+│   ├── chrome.py     # ChromeManager, ChromeTestingManager
+│   └── manager.py    # BrowserManager: Default browser switching
+├── core/
+│   ├── config.py     # AppConfig, ChromeConfig, GeminiConfig dataclasses
+│   ├── constants.py  # AuthStatus, RateLimitIndicators, URLs
+│   ├── exceptions.py # Custom Geminpy exceptions
+│   └── models.py     # Model shortcut resolution (MODEL_SHORTCUTS)
+├── gemini/
+│   ├── client.py     # GeminiClient: Main orchestrator
+│   ├── executor.py   # GeminiExecutor: Subprocess handling
+│   └── parser.py     # ResponseParser: Cleaning CLI output
+└── utils/
+    ├── logging.py    # Loguru setup
+    ├── platform.py   # macOS checks, command requirements
+    └── storage.py    # SettingsManager for settings.json
 ```
 
-### Running Tests
+### Key Components & Responsibilities
 
-```bash
-# Run all tests
-uvx hatch run test
+*   **`GeminiClient`**: The central coordinator. It uses other components to manage the browser, run OAuth, execute Gemini, and parse the response.
+*   **`OAuthAutomator`**: Employs Playwright to interact with Google's OAuth pages, selecting accounts and clicking buttons.
+*   **`ChromeTestingManager`**: Handles the installation (via `npx @puppeteer/browsers`), path storage, and user email storage for Chrome for Testing.
+*   **`ChromeManager`**: Launches and manages the Chrome for Testing process, ensuring its CDP port is ready.
+*   **`BrowserManager`**: Uses the `macdefaultbrowsy` Python package to get/set the macOS default browser.
+*   **`GeminiExecutor`**: Runs the `gemini` CLI as a subprocess, monitors its output for specific events like rate limits.
+*   **`ResponseParser`**: Cleans the raw stdout from the Gemini CLI to extract the actual model response.
+*   **`UserResolver`**: Determines the target Google account email based on CLI arguments, environment variables, or stored settings.
+*   **Configuration Dataclasses (`AppConfig`, etc.)**: Define the structure for application, Chrome, and Gemini settings.
+*   **`SettingsManager`**: Manages persistence of settings (like Chrome path and user email) in `settings.json`.
+*   **`MODEL_SHORTCUTS` & `resolve_model_name`**: Dynamically determine the correct full model names for shortcuts like "pro" and "flash" by parsing the local Gemini CLI's JavaScript files.
 
-# Run with coverage
-uvx hatch run test-cov
+### Settings Storage
 
-# Type checking
-uvx hatch run type-check
+`geminpy` stores its settings in:
+`~/Library/Application Support/com.twardoch.geminpy/settings.json`
 
-# Linting
-uvx hatch run lint
-```
+This file may contain:
+*   `chrome_testing_path`: The path to the Chrome for Testing executable.
+*   `gemini_cli_user`: The preferred Google account email for OAuth.
 
-### Building
+### Error Handling
 
-```bash
-# Build package
-uvx hatch build
+`geminpy` defines custom exceptions (e.g., `AuthenticationError`, `RateLimitError`, `ChromeError`, `PlatformError`) to provide specific error information. On OAuth failures, it attempts to save a screenshot (e.g., `oauth_error.png`) for debugging.
 
-# Install locally
-uv pip install --system -e .
-```
+### Security Notes
 
-## Security
+*   **Browser Isolation**: Uses Chrome for Testing, keeping automation separate from your main browser profile and history.
+*   **Local Automation**: All browser interactions for OAuth occur locally on your machine via Playwright and CDP.
+*   **No Credential Storage**: `geminpy` does not store passwords or authentication tokens. It only saves your preferred email address if you provide it.
 
-- **No credential storage** - Only stores email preference
-- **Local automation only** - All OAuth happens on your machine
-- **Temporary browser access** - Restored after each use
-- **Process isolation** - Chrome runs in separate process
+## Development & Contribution
 
-## Requirements
+`geminpy` is built using [Hatch](https://hatch.pypa.io/).
 
-- **Platform**: macOS (Darwin) only
-- **Python**: 3.10, 3.11, or 3.12
-- **Browser**: Chrome for Testing (auto-installed)
+### Setup
+
+1.  Clone the repository.
+2.  Ensure you have `uv` installed (`pip install uv`).
+3.  Install dependencies in a virtual environment: `uv pip install -e .[dev,test]`
+
+### Key Development Commands
+
+*   **Run tests**: `uvx hatch run test`
+*   **Run tests with coverage**: `uvx hatch run test-cov`
+*   **Type checking (MyPy)**: `uvx hatch run type-check`
+*   **Linting (Ruff)**: `uvx hatch run lint`
+*   **Formatting (Ruff Format)**: `uvx hatch run fmt`
+*   **Build package**: `uvx hatch build`
+
+### Coding Conventions (from `CLAUDE.md` & `AGENTS.md`)
+
+*   Use `uv pip` for dependency management.
+*   Prefer `python -m <module>` for running modules.
+*   Write clear docstrings and descriptive names.
+*   Use modern type hints (e.g., `list`, `dict`, `str | None`).
+*   Employ f-strings for string formatting.
+*   Use Loguru for logging, with verbose options.
+*   Use Fire and Rich for CLI interfaces.
+*   Include a `this_file: path/to/file.py` comment near the top of Python files.
+*   Modularize logic into single-purpose functions.
 
 ## License
 
-MIT License - see LICENSE file for details.
-
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
