@@ -69,7 +69,6 @@ def _parse_gemini_models() -> dict[str, str]:
         pro_match = re.search(pro_pattern, content)
         if pro_match:
             models["pro"] = pro_match.group(1)
-            logger.debug(f"Parsed pro model: {models['pro']}")
 
         # Look for DEFAULT_GEMINI_FLASH_MODEL
         flash_pattern = (
@@ -79,7 +78,6 @@ def _parse_gemini_models() -> dict[str, str]:
         flash_match = re.search(flash_pattern, content)
         if flash_match:
             models["flash"] = flash_match.group(1)
-            logger.debug(f"Parsed flash model: {models['flash']}")
 
         # Use parsed values or fall back to defaults
         return {
