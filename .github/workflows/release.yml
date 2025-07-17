@@ -9,12 +9,9 @@ permissions:
   id-token: write
 
 jobs:
-  release:
-    name: Release to PyPI
+  test:
+    name: Run Tests
     runs-on: ubuntu-latest
-    environment:
-      name: pypi
-      url: https://pypi.org/p/geminpy
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -24,17 +21,49 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.11"
 
       - name: Install UV
         uses: astral-sh/setup-uv@v5
         with:
           version: "latest"
-          python-version: "3.12"
+          python-version: "3.11"
+          enable-cache: true
+
+      - name: Install dependencies
+        run: |
+          uv pip install --system pytest pytest-cov pytest-xdist pytest-asyncio mypy ruff fire playwright requests platformdirs loguru rich aiohttp
+
+      - name: Run tests
+        run: |
+          uv run pytest --cov=src/geminpy --cov-report=xml -v tests/
+        env:
+          PYTHONPATH: src
+
+  build-python:
+    name: Build Python Package
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install UV
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          python-version: "3.11"
           enable-cache: true
 
       - name: Install build tools
-        run: uv pip install build hatchling hatch-vcs
+        run: uv pip install --system build hatchling hatch-vcs
 
       - name: Build distributions
         run: uv run python -m build --outdir dist
@@ -45,15 +74,195 @@ jobs:
           test -n "$(find dist -name '*.whl')" || (echo "Wheel file missing" && exit 1)
           test -n "$(find dist -name '*.tar.gz')" || (echo "Source distribution missing" && exit 1)
 
+      - name: Upload Python artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package
+          path: dist/*
+
+  build-binaries:
+    name: Build Binaries
+    needs: test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            asset_name: geminpy-linux-x86_64
+            binary_name: geminpy
+          - os: macos-latest
+            asset_name: geminpy-macos-x86_64
+            binary_name: geminpy
+          - os: macos-14  # Apple Silicon
+            asset_name: geminpy-macos-arm64
+            binary_name: geminpy
+          - os: windows-latest
+            asset_name: geminpy-windows-x86_64.exe
+            binary_name: geminpy.exe
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install UV
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          python-version: "3.11"
+          enable-cache: true
+
+      - name: Install dependencies
+        run: |
+          uv pip install --system pyinstaller fire playwright requests platformdirs loguru rich aiohttp
+
+      - name: Install macOS-specific dependencies
+        if: runner.os == 'macOS'
+        run: |
+          uv pip install --system macdefaultbrowsy
+
+      - name: Install package in development mode
+        run: |
+          uv pip install --system -e .
+
+      - name: Build binary (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          pyinstaller --onefile \
+            --name geminpy \
+            --add-data "src/geminpy:geminpy" \
+            --collect-all loguru \
+            --collect-all rich \
+            --collect-all fire \
+            --collect-all playwright \
+            --hidden-import=playwright \
+            --hidden-import=playwright.sync_api \
+            --hidden-import=playwright.async_api \
+            src/geminpy/__main__.py
+
+      - name: Build binary (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          pyinstaller --onefile ^
+            --name geminpy ^
+            --add-data "src/geminpy;geminpy" ^
+            --collect-all loguru ^
+            --collect-all rich ^
+            --collect-all fire ^
+            --collect-all playwright ^
+            --hidden-import=playwright ^
+            --hidden-import=playwright.sync_api ^
+            --hidden-import=playwright.async_api ^
+            src/geminpy/__main__.py
+        shell: cmd
+
+      - name: Test binary (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          ./dist/geminpy --help
+
+      - name: Test binary (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          dist\geminpy.exe --help
+
+      - name: Rename binary
+        run: |
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            mv dist/${{ matrix.binary_name }} ${{ matrix.asset_name }}
+          else
+            mv dist/${{ matrix.binary_name }} ${{ matrix.asset_name }}
+          fi
+        shell: bash
+
+      - name: Upload binary artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset_name }}
+          path: ${{ matrix.asset_name }}
+
+  create-release:
+    name: Create GitHub Release
+    needs: [build-python, build-binaries]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: false
+          prerelease: ${{ contains(github.ref, '-') }}
+          generate_release_notes: true
+          files: |
+            python-package/*
+            geminpy-*
+          body: |
+            ## Installation
+
+            ### Python Package
+            ```bash
+            pip install geminpy
+            ```
+
+            ### Binary Downloads
+            Download the appropriate binary for your platform:
+            - **Linux**: `geminpy-linux-x86_64`
+            - **macOS (Intel)**: `geminpy-macos-x86_64`
+            - **macOS (Apple Silicon)**: `geminpy-macos-arm64`
+            - **Windows**: `geminpy-windows-x86_64.exe`
+
+            Make the binary executable and add it to your PATH:
+            ```bash
+            chmod +x geminpy-*
+            sudo mv geminpy-* /usr/local/bin/geminpy
+            ```
+
+            ## Usage
+            ```bash
+            geminpy -p "Your prompt here"
+            ```
+
+            🚀 Generated with [Claude Code](https://claude.ai/code)
+
+            Co-Authored-By: Claude <noreply@anthropic.com>
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-pypi:
+    name: Publish to PyPI
+    needs: [build-python, build-binaries]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/geminpy
+    if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download Python artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package
+          path: dist/
+
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_TOKEN }}
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: dist/*
-          generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+          skip-existing: true 

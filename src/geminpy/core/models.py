@@ -102,7 +102,8 @@ def __getattr__(name: str) -> Any:
     """Lazy loading for MODEL_SHORTCUTS."""
     if name == "MODEL_SHORTCUTS":
         return get_model_shortcuts()
-    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    msg = f"module {__name__!r} has no attribute {name!r}"
+    raise AttributeError(msg)
 
 
 def resolve_model_name(model: str | None) -> str | None:

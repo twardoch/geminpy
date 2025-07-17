@@ -1,13 +1,29 @@
 # this_file: src/geminpy/browser/manager.py
 """Manages default browser settings on macOS."""
 
-from macdefaultbrowsy import (
-    get_default_browser,
-    get_browsers,
-    set_default_browser,
-)
+import sys
 
 from loguru import logger
+
+# Platform-specific imports
+if sys.platform == "darwin":
+    from macdefaultbrowsy import (
+        get_browsers,
+        get_default_browser,
+        set_default_browser,
+    )
+else:
+    # Mock implementations for non-macOS platforms
+    def get_default_browser():
+        msg = "Browser management only supported on macOS"
+        raise NotImplementedError(msg)
+
+    def get_browsers():
+        return []
+
+    def set_default_browser(browser_id: str):
+        msg = "Browser management only supported on macOS"
+        raise NotImplementedError(msg)
 
 
 class BrowserManager:
