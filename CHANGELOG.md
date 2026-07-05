@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Repository modernization (2026-07)
+- **CI/CD**: Added `.github/workflows/ci.yml` (ruff + mypy + mocked pytest on
+  macOS and Linux, Python 3.10–3.12) and `.github/workflows/release.yml`
+  (tag-triggered build, GitHub release, and PyPI trusted publishing). No live
+  Gemini or real Chrome is needed in CI — every browser/network call is mocked.
+- **Test fixes**: Corrected the `OAuthAutomator` connection tests, which mocked
+  `aiohttp` `session.get()` as a coroutine instead of an async context manager.
+  Full suite is green (67 tests).
+- **Type & correctness fixes** (mypy clean):
+  - `GeminiExecutor.execute` now declares its real return type
+    (`tuple[Popen[str], None, None]`) instead of the false `tuple[int, str, str]`.
+  - Interactive mode awaited `Popen.wait()`, which is not awaitable; it now runs
+    the blocking wait in an executor.
+  - Browser restore is skipped when the original default was never resolved.
+  - Annotated `parser` response accumulator and `UserResolver.resolve_user_email`
+    callback.
+- **Docs**: Added a Jekyll + Just the Docs site under `docs/` (home, installation,
+  usage, how-it-works, API reference) and trimmed `README.md` from ~270 to ~130
+  lines, moving the deep dive into the site.
+- **Icon**: Added `docs/assets/icon.png` (monochrome line illustration, <500 KB).
+- **Comments**: Explained the OAuth state machine and the model-alias resolution
+  for readers new to the codebase.
+- **.gitignore**: Now ignores the generated `llms.txt` and editor `.specstory/`.
+
 ### Added
 - **Multi-language OAuth Support**: Enhanced OAuth button detection to support 9+ languages
   - Added support for Polish, French, German, Spanish, Italian, Russian, Japanese, and Chinese

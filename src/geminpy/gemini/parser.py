@@ -22,7 +22,7 @@ class ResponseParser:
         lines = stdout.strip().split("\n")
 
         # Skip authentication-related lines and find the actual response
-        response_lines = []
+        response_lines: list[str] = []
         found_auth_complete = False
 
         for line in lines:

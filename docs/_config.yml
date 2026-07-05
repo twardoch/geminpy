@@ -1,0 +1,32 @@
+# Jekyll configuration for the geminpy documentation site.
+# Served via GitHub Pages using the remote Just the Docs theme.
+title: geminpy
+description: Automated OAuth wrapper for Google's Gemini CLI on macOS
+remote_theme: just-the-docs/just-the-docs
+url: https://twardoch.github.io
+baseurl: /geminpy
+
+# Just the Docs settings
+color_scheme: light
+search_enabled: true
+heading_anchors: true
+
+aux_links:
+  geminpy on GitHub:
+    - https://github.com/twardoch/geminpy
+  geminpy on PyPI:
+    - https://pypi.org/project/geminpy/
+aux_links_new_tab: true
+
+# Footer
+back_to_top: true
+back_to_top_text: "Back to top"
+
+plugins:
+  - jekyll-remote-theme
+
+# Exclude non-site files from the build
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor

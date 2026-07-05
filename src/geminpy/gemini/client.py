@@ -81,8 +81,8 @@ class GeminiClient:
             return response
 
         finally:
-            # Restore browser
-            if orig_browser != BrowserID.TESTING:
+            # Restore browser (skip if we never learned the original default)
+            if orig_browser and orig_browser != BrowserID.TESTING:
                 self.browser_manager.set_default(orig_browser)
                 logger.debug(f"Restored default browser to {orig_browser}")
 
@@ -116,8 +116,9 @@ class GeminiClient:
             # Don't monitor for rate limits in interactive mode
             # Just wait for the process to complete naturally
             try:
-                # Let the process run interactively
-                await proc.wait()
+                # Popen.wait() is blocking, so run it off the event loop to keep
+                # the interactive session responsive.
+                await asyncio.get_event_loop().run_in_executor(None, proc.wait)
                 # Return empty string to indicate success without parsing
                 return ""
             except Exception as e:

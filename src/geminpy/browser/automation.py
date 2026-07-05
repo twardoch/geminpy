@@ -4,6 +4,7 @@
 import asyncio
 import os
 import re
+from collections.abc import Callable
 
 import aiohttp
 from loguru import logger
@@ -60,7 +61,22 @@ class OAuthAutomator:
         await page.wait_for_url(pattern, wait_until="load", timeout=timeout * 1000)
 
     async def run_oauth_flow(self, user_email: str | None) -> None:
-        """Execute the complete OAuth flow."""
+        """Drive Google's consent screens from account picker to success.
+
+        The flow is a small three-state machine over the OAuth page found by
+        :meth:`_connect_playwright`:
+
+        1. **Pick account** — click the tile for ``user_email`` (matched by
+           ``data-identifier``, then by link text), or the first account when no
+           email is given.
+        2. **Approve access** — wait for the consent page, then click the approve
+           button, trying a list of selectors from most to least stable.
+        3. **Confirm success** — wait for the redirect URL to match
+           ``SUCCESS_PATTERN`` and close the tab.
+
+        Playwright is always stopped in the ``finally`` block, even on failure, so
+        a half-finished sign-in never leaks a browser connection.
+        """
         pw, page = await self._connect_playwright()
         try:
             logger.debug(f"Automating page: {page.url}")
@@ -157,7 +173,10 @@ class UserResolver:
     """Resolves the target user email from multiple sources."""
 
     @staticmethod
-    def resolve_user_email(cli_user: str | None = None, settings_getter=None) -> str | None:
+    def resolve_user_email(
+        cli_user: str | None = None,
+        settings_getter: Callable[[], str | None] | None = None,
+    ) -> str | None:
         """Resolve user email from multiple sources in priority order."""
         # 1. --user command line argument
         if cli_user:

@@ -17,8 +17,16 @@ class GeminiExecutor:
         """Initialize with Gemini executable path."""
         self.executable = str(executable)
 
-    async def execute(self, args: list[str], timeout: int = 120, interactive: bool = False) -> tuple[int, str, str]:
-        """Execute gemini CLI and return (returncode, stdout, stderr)."""
+    async def execute(
+        self, args: list[str], timeout: int = 120, interactive: bool = False
+    ) -> tuple[subprocess.Popen[str], None, None]:
+        """Launch the gemini CLI and hand back the live process for monitoring.
+
+        Returns the running ``Popen`` alongside two ``None`` placeholders so callers
+        can unpack ``proc, _, _``. stdout/stderr are read later by
+        :meth:`monitor_process` and :meth:`wait_completion`, not here — the process
+        must stay alive while the OAuth browser dance happens in parallel.
+        """
         # Ensure -y flag is present
         if "-y" not in args and "--yes" not in args:
             args = ["-y", *args]

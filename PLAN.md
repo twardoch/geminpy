@@ -1,5 +1,14 @@
 # Geminpy Streamlining Plan
 
+## Status note (2026-07 modernization pass)
+
+Repository scaffolding is now current: CI and release workflows added, test suite
+green (67, all mocked), ruff + mypy clean, a Jekyll + Just the Docs site under
+`docs/`, a project icon, and a trimmed README. The type-correctness and
+interactive-`wait()` bugs below are fixed. Remaining open work is the deeper
+`GeminiClient` orchestration tests and the possible move to `playwrightauthor` for
+browser management — tracked in `TODO.md`.
+
 ## Executive Summary
 
 This plan outlines a comprehensive approach to streamline the geminpy codebase, addressing critical bugs, improving code quality, enhancing test coverage, and establishing sustainable development practices. The project has a solid foundation but requires focused improvements in reliability, testing, and user experience.

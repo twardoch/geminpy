@@ -2,7 +2,7 @@
 """Tests for the OAuthAutomator."""
 
 import os
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -62,7 +62,9 @@ class TestOAuthAutomator:
         mock_response.json = AsyncMock(return_value={"webSocketDebuggerUrl": "ws://localhost:9222/devtools/browser"})
 
         mock_session = AsyncMock()
-        mock_session.get = AsyncMock(return_value=mock_response)
+        # aiohttp's session.get() returns a request context manager synchronously,
+        # so it must be a plain (non-async) callable yielding an async CM, not a coroutine.
+        mock_session.get = MagicMock(return_value=mock_response)
         mock_session.__aenter__ = AsyncMock(return_value=mock_session)
         mock_session.__aexit__ = AsyncMock(return_value=None)
 
@@ -102,7 +104,9 @@ class TestOAuthAutomator:
         mock_response.json = AsyncMock(return_value={"webSocketDebuggerUrl": "ws://localhost:9222/devtools/browser"})
 
         mock_session = AsyncMock()
-        mock_session.get = AsyncMock(return_value=mock_response)
+        # aiohttp's session.get() returns a request context manager synchronously,
+        # so it must be a plain (non-async) callable yielding an async CM, not a coroutine.
+        mock_session.get = MagicMock(return_value=mock_response)
         mock_session.__aenter__ = AsyncMock(return_value=mock_session)
         mock_session.__aexit__ = AsyncMock(return_value=None)
 

@@ -1,5 +1,13 @@
 # this_file: src/geminpy/core/models.py
-"""Model name mapping and utilities."""
+"""Model name mapping and utilities.
+
+Users type short aliases — ``pro`` and ``flash`` — instead of full model IDs like
+``gemini-2.5-pro``. Rather than hard-code those IDs (which drift as Google ships
+new versions), this module reads the ``models.js`` that ships with the installed
+``@google/gemini-cli`` and pins each alias to whatever that CLI currently
+defaults to. If the file can't be found or parsed, it falls back to
+``_FALLBACK_MODELS``. The resolved map is cached after the first lookup.
+"""
 
 import re
 import subprocess

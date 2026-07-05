@@ -40,7 +40,7 @@ class TestGeminiExecutor:
         # Verify the command was constructed correctly
         expected_cmd = ["gemini", "-y", "-p", "test prompt"]
         mock_popen.assert_called_once()
-        args, kwargs = mock_popen.call_args
+        args, _kwargs = mock_popen.call_args
         assert args[0] == expected_cmd
 
     @patch("subprocess.Popen")
@@ -56,7 +56,7 @@ class TestGeminiExecutor:
 
         # Verify -y wasn't duplicated
         expected_cmd = ["gemini", "-y", "-p", "test"]
-        args, kwargs = mock_popen.call_args
+        args, _kwargs = mock_popen.call_args
         assert args[0] == expected_cmd
 
     @patch("subprocess.Popen")
@@ -72,7 +72,7 @@ class TestGeminiExecutor:
 
         # Verify -y wasn't added when --yes is present
         expected_cmd = ["gemini", "--yes", "-p", "test"]
-        args, kwargs = mock_popen.call_args
+        args, _kwargs = mock_popen.call_args
         assert args[0] == expected_cmd
 
     def test_check_rate_limit_detection(self):

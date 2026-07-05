@@ -1,5 +1,21 @@
 # Geminpy TODO List
 
+## ✅ Repository modernization (2026-07)
+
+- [x] Add CI workflow (ruff + mypy + mocked pytest, macOS + Linux, py3.10–3.12)
+- [x] Add tag-triggered release workflow (build + GitHub release + PyPI publish)
+- [x] Fix failing OAuth automation tests (aiohttp async-CM mock) — suite green (67)
+- [x] mypy clean: correct `GeminiExecutor.execute` return type
+- [x] Fix non-awaitable `Popen.wait()` in interactive mode
+- [x] Jekyll + Just the Docs site under `docs/`; trim README
+- [x] Add `docs/assets/icon.png` (<500 KB)
+- [x] `.gitignore`: ignore generated `llms.txt` and `.specstory/`
+
+### Remaining ideas (bigger, deferred)
+- [ ] Add `GeminiClient` orchestration tests (full auth flow, retry, cleanup) — all mocked
+- [ ] Add end-to-end mocked integration test (CLI → API → settings persistence)
+- [ ] Consider depending on `playwrightauthor` instead of re-implementing Chrome management
+
 ## 🚨 Critical Bug Fixes (Immediate)
 
 - [x] Fix interactive mode output suppression (Issue #102) ✅
@@ -39,9 +55,9 @@
   - [ ] Settings persistence
   - [ ] First-time setup flow
 
-- [ ] Fix failing OAuth automation tests
-  - [ ] Fix aiohttp mock setup issues
-  - [ ] Update test expectations
+- [x] Fix failing OAuth automation tests ✅
+  - [x] Fix aiohttp mock setup issues (async context manager, not coroutine)
+  - [x] Update test expectations
 
 ## 🏗️ Code Quality (Week 2-3)
 

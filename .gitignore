@@ -297,3 +297,6 @@ wheels/
 x64/
 x86/
 dist/
+# Project-specific: generated / editor artifacts, not source of truth
+llms.txt
+.specstory/
